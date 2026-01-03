@@ -1,0 +1,7 @@
+dependencies {
+    implementation(libs.balmForge) {
+        changing = libs.versions.balm.get().contains("SNAPSHOT")
+    }
+    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
+}
+

@@ -1,0 +1,98 @@
+package com.teamneon.theelemental.item;
+
+import com.teamneon.theelemental.block.ModBlocks;
+import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
+import com.teamneon.theelemental.data.ElementalDataHandler;
+import com.teamneon.theelemental.helpers.ElementRegistry;
+import com.teamneon.theelemental.helpers.KingdomAnchorHelper;
+import com.teamneon.theelemental.kingdoms.KingdomSavedData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+
+import java.util.Set;
+
+public class KingdomCoreItem extends Item {
+
+    public KingdomCoreItem(Properties properties) {
+        super(properties.stacksTo(1));
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+
+        ServerLevel serverLevel = (ServerLevel) level;
+        Player player = context.getPlayer();
+        BlockPos clickedPos = context.getClickedPos();
+
+        // Only elemental creatures can create kingdoms
+        int playerElement = ElementalDataHandler.get(player).getElement();
+        if (playerElement <= 0) {
+            player.displayClientMessage(Component.literal("Only an elemental creature can create a kingdom!"), true);
+            return InteractionResult.FAIL;
+        }
+
+        KingdomSavedData globalData = KingdomSavedData.get(serverLevel);
+        BlockPos existingCorePos = globalData.getCorePos(playerElement);
+
+        // Kingdom exists? Teleport player to it
+        if (existingCorePos != null) {
+            player.displayClientMessage(Component.literal("Kingdom already exists! Teleporting and joining..."), true);
+
+            if (serverLevel.getBlockEntity(existingCorePos) instanceof KingdomCoreBlockEntity core) {
+                core.addMember(player.getUUID());
+            }
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.teleportTo(
+                        serverLevel,
+                        existingCorePos.getX() + 0.5,
+                        existingCorePos.getY() + 1.0,
+                        existingCorePos.getZ() + 0.5,
+                        Set.of(Relative.X_ROT, Relative.Y_ROT),
+                        serverPlayer.getYRot(),
+                        serverPlayer.getXRot(),
+                        false
+                );
+            }
+
+            return InteractionResult.SUCCESS;
+        }
+
+        if (!serverLevel.dimension().equals(Level.OVERWORLD)) {
+            player.displayClientMessage(Component.literal("Kingdoms can only be created in the Overworld!"), true);
+            return InteractionResult.FAIL;
+        }
+
+        // Otherwise, create the kingdom
+        BlockPos corePos = clickedPos.above();
+        serverLevel.setBlock(corePos, ModBlocks.KINGDOM_CORE.defaultBlockState(), 3);
+        globalData.registerCore(playerElement, corePos);
+        BlockPos anchorPos = KingdomAnchorHelper.getAnchorPos(serverLevel, playerElement);
+        if (anchorPos != null) {
+            serverLevel.setBlock(anchorPos, ModBlocks.KINGDOM_ANCHOR.defaultBlockState(), 3);
+        }
+
+        if (serverLevel.getBlockEntity(corePos) instanceof KingdomCoreBlockEntity core) {
+            core.setOwner(player.getUUID());
+            core.setElement(playerElement);
+        }
+
+        serverLevel.getServer().getPlayerList().broadcastSystemMessage(
+                Component.literal(player.getName().getString() + " has created the " + ElementRegistry.getName(playerElement) + " Kingdom!"),
+                false
+        );
+
+        context.getItemInHand().shrink(1);
+        return InteractionResult.SUCCESS;
+    }
+}

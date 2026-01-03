@@ -1,0 +1,8 @@
+dependencies {
+    implementation(libs.balmCommon) {
+        changing = libs.versions.balm.get().endsWith("SNAPSHOT")
+    }
+
+    implementation "software.bernie.geckolib:geckolib-common-${minecraft_version}:${geckolib_version}"
+
+}

@@ -1,0 +1,51 @@
+# eclipse
+bin
+*.launch
+.eclipse
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+runs
+runserver
+logs
+
+# Modern Gradle & Java
+.gradle
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Balm / Architectury / Multi-loader specifics
+# This prevents your local dev-runtime from syncing
+local.properties
+.fabric
+.architectury
+
+# Minecraft specific
+/run/
+/runs/
+/runserver/
+/runclient/
+/gametestresults/
+
+# Secrets (if you ever use a keystore to sign your mod)
+*.jks
+*.keystore
+
+common/src/generated/resources/.cache
