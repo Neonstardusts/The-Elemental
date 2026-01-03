@@ -12,6 +12,8 @@ public class TheelementalClient {
     public static void initialize(BalmClientRegistrars registrars) {
         ModKeyMappings.initialize();
 
+        registrars.blockEntityRenderers(ModRenderers::initialize);
+
         RenderCallback.Gui.AFTER.register((guiGraphics, window) -> {
             Minecraft client = Minecraft.getInstance();
             if (client.player != null) {

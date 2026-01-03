@@ -17,6 +17,7 @@ public class ModItems {
     public static void initialize(BalmItemRegistrar items) {
         yourItem = items.register("your_item", Item::new).asDeferredItem();
 
+
         MAGIC_TEST_ITEM = items.register("magic_test_item", MagicTestItem::new).asDeferredItem();
         KINGDOM_CORE_ITEM = items.register("kingdom_starter", KingdomCoreItem::new).asDeferredItem();
     }

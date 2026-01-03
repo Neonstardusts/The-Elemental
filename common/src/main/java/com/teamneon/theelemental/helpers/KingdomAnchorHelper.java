@@ -6,8 +6,8 @@ import net.minecraft.server.level.ServerLevel;
 
 public class KingdomAnchorHelper {
 
-    private static final int NUM_PILLARS = 9;
-    private static final double RADIUS = 8;
+    public static final int NUM_PILLARS = 9;
+    public static final double RADIUS = 8;
 
     /**
      * Returns the world position of the Kingdom Anchor for a given element.
@@ -33,7 +33,7 @@ public class KingdomAnchorHelper {
         int z = altarPos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS);
 
         // Y same as altar
-        int y = altarPos.getY()-1;
+        int y = altarPos.getY();
 
         return new BlockPos(x, y, z);
     }

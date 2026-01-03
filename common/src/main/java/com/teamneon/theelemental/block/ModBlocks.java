@@ -12,6 +12,8 @@ public class ModBlocks {
     public static DeferredBlock WORLD_REACTOR;
     public static DeferredBlock KINGDOM_CORE;
     public static DeferredBlock KINGDOM_ANCHOR;
+    public static DeferredBlock WORLD_CRAFTER;
+    public static DeferredBlock WORLD_CRAFTER_PILLAR;
 
     public static void initialize(BalmBlockRegistrar blocks) {
         yourBlock = blocks.register("your_block", Block::new, it -> it.strength(1.5f)).withDefaultItem().asDeferredBlock();
@@ -19,6 +21,8 @@ public class ModBlocks {
         WORLD_REACTOR = blocks.register("world_reactor", WorldReactor::new,  it -> it.strength(1.5f)).withDefaultItem().asDeferredBlock();
         KINGDOM_CORE = blocks.register("kingdom_core", KingdomCoreBlock::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
         KINGDOM_ANCHOR = blocks.register("kingdom_anchor", KingdomAnchor::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
+        WORLD_CRAFTER = blocks.register("world_crafter", WorldCrafter::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
+        WORLD_CRAFTER_PILLAR = blocks.register("world_crafter_pillar", WorldCrafterPillar::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
 
     }
 

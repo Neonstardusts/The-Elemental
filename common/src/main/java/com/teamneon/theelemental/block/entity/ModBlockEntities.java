@@ -8,10 +8,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 public class ModBlockEntities {
 
     public static BalmBlockEntityTypeRegistration<KingdomCoreBlockEntity> KINGDOM_CORE_REG;
+    public static BalmBlockEntityTypeRegistration<WorldCrafterEntity> WORLDCRAFTER_BE;
+    public static BalmBlockEntityTypeRegistration<WorldCrafterPillarEntity> WORLDCRAFTER_PILLAR_BE;
 
     public static void initialize(BalmBlockEntityTypeRegistrar registrars) {
         KINGDOM_CORE_REG = registrars.register("kingdom_core",
                 KingdomCoreBlockEntity::new,
                 ModBlocks.KINGDOM_CORE);
+
+        WORLDCRAFTER_BE = registrars.register("world_crafter",
+        WorldCrafterEntity::new,
+        ModBlocks.WORLD_CRAFTER);
+
+        WORLDCRAFTER_PILLAR_BE = registrars.register("world_crafter_pillar",
+                WorldCrafterPillarEntity::new,
+                ModBlocks.WORLD_CRAFTER_PILLAR);
     }
 }

@@ -198,11 +198,17 @@ public class WorldReactor extends Block {
             int z = center.getZ() + (int) Math.round(Math.sin(angle) * R);
             BlockPos pillarPos = new BlockPos(x, center.getY(), z);
 
+            //Place Crafter
+            level.setBlock(center.below(), Blocks.AIR.defaultBlockState(), 3);
+            level.setBlock(center.below().below(), ModBlocks.WORLD_CRAFTER.defaultBlockState(), 3);
+
             // Build the pillar instantly
-            for (int y = -10; y < 0; y++) {
+            for (int y = -10; y < 1; y++) {
                 level.setBlock(pillarPos.above(y), Blocks.BASALT.defaultBlockState(), 3);
-                if (y == -1) {
-                    level.setBlock(pillarPos.above(y), Blocks.BEDROCK.defaultBlockState(), 3);
+                if (y == 0) {
+                    level.setBlock(pillarPos, Blocks.BEDROCK.defaultBlockState(), 3);
+                    level.setBlock(pillarPos.below(), Blocks.AIR.defaultBlockState(), 3);
+                    level.setBlock(pillarPos.below(2), ModBlocks.WORLD_CRAFTER_PILLAR.defaultBlockState(), 3);
                 }
             }
 
