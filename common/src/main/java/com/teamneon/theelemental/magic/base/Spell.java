@@ -7,10 +7,16 @@ public abstract class Spell {
 
     protected final int manaCost;
     protected final int cooldownTicks;
+    protected final String name;
 
-    protected Spell(int manaCost, int cooldownTicks) {
+    protected Spell(int manaCost, int cooldownTicks, String name) {
         this.manaCost = manaCost;
         this.cooldownTicks = cooldownTicks;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getManaCost() {

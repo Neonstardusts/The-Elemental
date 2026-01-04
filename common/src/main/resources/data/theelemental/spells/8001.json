@@ -1,0 +1,11 @@
+{
+  "SpellName": "Blink",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "Description": "teleport",
+  "RecipeItems": {
+    "minecraft:ender_pearl": 2,
+    "minecraft:amethyst_shard": 1,
+    "minecraft:obsidian": 3
+  }
+}

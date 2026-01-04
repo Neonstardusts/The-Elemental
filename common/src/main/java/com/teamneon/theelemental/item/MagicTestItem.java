@@ -2,7 +2,11 @@ package com.teamneon.theelemental.item;
 
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
+import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
+import net.blay09.mods.balm.Balm;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -25,16 +29,30 @@ public class MagicTestItem extends Item {
             //set mana to 0
             data.setCurrentMana(0);
 
-            // 3. Set FIRST active slot to random spell
-            data.setSlot(0, 1);
-            data.setSlot(4, 8001);
-            data.setSlot(3, 6001);
-            data.setSlot(2, 3001);
+            // Set active slots
+            int[] spellIds = {1, 0, 3001, 6001, 8001}; // slots 0-4
 
-            // 4. Sync + Save
+            for (int i = 0; i < spellIds.length; i++) {
+                data.setSlot(i, spellIds[i]);
+
+                // 1️⃣ Sync spell info to client for each new spell
+                if (spellIds[i] > 0) {
+                    ResourceManager manager = player.level().getServer().getResourceManager();
+                    var spell = SpellRegistry.getSpell(spellIds[i], manager); // server-side
+                    if (spell != null) {
+                        Balm.networking().sendTo(player, new SyncSpellInfoPacket(
+                                spellIds[i],
+                                spell.getName(),
+                                spell.getManaCost(),
+                                spell.getCooldownTicks()
+                        ));
+                    }
+                }
+            }
+
+            // 2️⃣ Sync slots + save
             ElementalDataHandler.syncToClient(player);
             ElementalDataHandler.save(player);
-
 
             return InteractionResult.SUCCESS;
         }

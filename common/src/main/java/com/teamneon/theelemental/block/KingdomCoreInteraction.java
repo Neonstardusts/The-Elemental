@@ -119,9 +119,11 @@ public class KingdomCoreInteraction {
                     Number cooldownNum = (Number) spellJson.getOrDefault("Cooldown", 0);
                     int cooldown = cooldownNum.intValue();
                     String description = (String) spellJson.getOrDefault("Description", "No description");
+                    Number durationNum = (Number) spellJson.getOrDefault("Duration", 0); // or "Duration" if that's your key
+                    int durationTicks = durationNum.intValue();
 
                     // Create RuneData with spellName
-                    RuneData runeData = new RuneData(elementId, spellId, spellName, recipeItems, manaCost, cooldown, description);
+                    RuneData runeData = new RuneData(elementId, spellId, spellName, recipeItems, manaCost, cooldown, description, durationTicks);
 
                     // Attach component to ItemStack
                     elementRune.set(ModComponents.rune.value(), runeData);

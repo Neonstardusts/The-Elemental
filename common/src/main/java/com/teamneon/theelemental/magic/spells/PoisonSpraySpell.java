@@ -15,8 +15,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class PoisonSpraySpell extends DurationSpell {
 
-    public PoisonSpraySpell(int manaCost, int cooldownTicks, long durationTicks) {
-        super(manaCost, cooldownTicks, durationTicks);
+    public PoisonSpraySpell(int manaCost, int cooldownTicks,  String name, long durationTicks) {
+        super(manaCost, cooldownTicks, name, durationTicks);
     }
 
     @Override

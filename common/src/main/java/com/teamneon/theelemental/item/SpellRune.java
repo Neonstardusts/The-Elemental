@@ -65,6 +65,16 @@ public class SpellRune extends Item {
 
         );
 
+        double durationSeconds = Math.round(runeData.durationTicks() / 20.0 * 10) / 10.0;
+        if (runeData.durationTicks() > 0) {
+            tooltipAdder.accept(Component.empty()
+                    .append(Component.literal("          ♒").withStyle(style -> style.withColor(0xb36fad)))
+                    .append(Component.literal(" ᴅᴜʀᴀᴛɪᴏɴ →").withStyle(style -> style.withColor(0x8a8a8a)))
+                    .append(Component.literal(" "+durationSeconds+"s").withStyle(style -> style.withColor(0xb36fad)))
+
+            );
+        }
+
         tooltipAdder.accept(Component.empty());
 
         tooltipAdder.accept(Component.literal("ᴅᴇꜱᴄʀɪᴘᴛɪᴏɴ: ").withStyle(style -> style.withColor(0x8a8a8a)));

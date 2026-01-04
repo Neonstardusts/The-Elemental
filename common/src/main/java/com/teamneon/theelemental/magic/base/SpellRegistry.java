@@ -13,7 +13,7 @@ public class SpellRegistry {
     private static final Map<Integer, SpellFactory> SPELLS = new HashMap<>();
     private static final Map<Integer, Integer> SPELL_COUNT = new HashMap<>();
 
-    private static final Spell EMPTY = new Spell(0, 0) {
+    private static final Spell EMPTY = new Spell(0, 0, "") {
         @Override
         public SpellCastResult execute(net.minecraft.world.level.Level level,
                                        net.minecraft.world.entity.player.Player player) {
@@ -21,25 +21,33 @@ public class SpellRegistry {
         }
     };
 
+    private static String strVal(Map<String, Object> json, String key) {
+        return (String) json.getOrDefault(key, "");
+    }
+
+
     public static void init() {
         register(1001, json ->
                 new FireballSpell(
                         intVal(json, "ManaCost"),
-                        intVal(json, "Cooldown")
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
                 )
         );
 
         register(8001, json ->
                 new BlinkSpell(
                         intVal(json, "ManaCost"),
-                        intVal(json, "Cooldown")
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
                 )
         );
 
-        register(3001, json ->
+        register(4001, json ->
                 new PoisonSpraySpell(
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
                         intVal(json, "Duration")
                 )
         );
@@ -48,6 +56,7 @@ public class SpellRegistry {
                 new TorrentSpell(
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
                         intVal(json, "Duration")
                 )
         );

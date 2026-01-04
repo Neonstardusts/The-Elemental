@@ -13,9 +13,12 @@ public record RuneData(
         Map<String, Integer> recipeItems,
         int manaCost,
         int cooldown,
-        String description
+        String description,
+        int durationTicks // 0 if the spell has no duration
 ) {
-    public static final RuneData EMPTY = new RuneData(0, 0, "Unknown Spell", new HashMap<>(), 0, 0, "No description");
+    public static final RuneData EMPTY = new RuneData(
+            0, 0, "Unknown Spell", new HashMap<>(), 0, 0, "No description", 0
+    );
 
     public static final Codec<RuneData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -25,7 +28,8 @@ public record RuneData(
                     Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("recipeItems").forGetter(RuneData::recipeItems),
                     Codec.INT.fieldOf("manaCost").forGetter(RuneData::manaCost),
                     Codec.INT.fieldOf("cooldown").forGetter(RuneData::cooldown),
-                    Codec.STRING.fieldOf("description").forGetter(RuneData::description)
+                    Codec.STRING.fieldOf("description").forGetter(RuneData::description),
+                    Codec.INT.fieldOf("durationTicks").forGetter(RuneData::durationTicks)
             ).apply(instance, RuneData::new)
     );
 }

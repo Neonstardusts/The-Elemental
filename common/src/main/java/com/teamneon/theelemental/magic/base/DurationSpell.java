@@ -8,8 +8,8 @@ public abstract class DurationSpell extends Spell {
     protected final long durationTicks;
     protected long ticksElapsed = 0;
 
-    protected DurationSpell(int manaCost, int cooldownTicks, long durationTicks) {
-        super(manaCost, cooldownTicks);
+    protected DurationSpell(int manaCost, int cooldownTicks,  String name, long durationTicks) {
+        super(manaCost, cooldownTicks, name);
         this.durationTicks = durationTicks;
     }
 

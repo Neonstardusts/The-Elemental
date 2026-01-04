@@ -9,9 +9,10 @@ import net.minecraft.world.phys.Vec3;
 
 public class BlinkSpell extends Spell {
 
-    public BlinkSpell(int manaCost, int cooldownTicks) {
-        super(manaCost, cooldownTicks);
+    public BlinkSpell(int manaCost, int cooldownTicks, String name) {
+        super(manaCost, cooldownTicks, name);
     }
+
 
     // Spell-specific conditions
     @Override

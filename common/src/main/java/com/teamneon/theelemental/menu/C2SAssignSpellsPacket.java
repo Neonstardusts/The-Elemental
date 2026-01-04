@@ -3,10 +3,14 @@ package com.teamneon.theelemental.menu;
 import com.teamneon.theelemental.Theelemental;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
+import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
+import net.blay09.mods.balm.Balm;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
@@ -33,9 +37,22 @@ public record C2SAssignSpellsPacket(List<Integer> spellIds) implements CustomPac
 
         // Update the RAM cache
         for (int i = 0; i < spellIds.size(); i++) {
-            // Safety check: ensure we don't overwrite locked slots (-1)
-            if (data.getActiveSlots().get(i) != -1) {
-                data.setSlot(i, spellIds.get(i));
+            int spellId = spellIds.get(i);
+
+            // Safety check: ensure we don't overwrite locked slots (-1) and ignore 0s
+            if (spellId > 0 && data.getActiveSlots().get(i) != -1) {
+                data.setSlot(i, spellId);
+
+                ResourceManager manager = player.level().getServer().getResourceManager();
+                var spell = SpellRegistry.getSpell(spellId, manager); // server-side
+                if (spell != null) {
+                    Balm.networking().sendTo(player, new SyncSpellInfoPacket(
+                            spellId,
+                            spell.getName(),
+                            spell.getManaCost(),
+                            spell.getCooldownTicks()
+                    ));
+                }
             }
         }
 
@@ -43,4 +60,5 @@ public record C2SAssignSpellsPacket(List<Integer> spellIds) implements CustomPac
         ElementalDataHandler.save(player);
         ElementalDataHandler.syncToClient(player);
     }
+
 }

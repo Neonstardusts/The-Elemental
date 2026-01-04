@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class FireballSpell extends Spell {
 
-    public FireballSpell(int manaCost, int cooldownTicks) {
-        super(manaCost, cooldownTicks);
+    public FireballSpell(int manaCost, int cooldownTicks, String name) {
+        super(manaCost, cooldownTicks, name);
     }
 
     @Override

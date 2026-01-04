@@ -19,8 +19,8 @@ public class TorrentSpell extends DurationSpell {
 
     private float angle = 0f;
 
-    public TorrentSpell(int manaCost, int cooldownTicks, long durationTicks) {
-        super(manaCost, cooldownTicks, durationTicks);
+    public TorrentSpell(int manaCost, int cooldownTicks,  String name, long durationTicks) {
+        super(manaCost, cooldownTicks, name, durationTicks);
     }
 
     @Override

@@ -1,0 +1,12 @@
+{
+  "SpellName": "Poison Spray",
+  "ManaCost": 20,
+  "Cooldown": 60,
+  "Duration": 200,
+  "Description": "Spray poison breath, duration spell",
+  "RecipeItems": {
+    "minecraft:moss_block": 2,
+    "minecraft:amethyst_shard": 1,
+    "minecraft:spore_blossom": 3
+  }
+}

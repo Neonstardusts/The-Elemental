@@ -1,0 +1,12 @@
+{
+  "SpellName": "Torrent",
+  "ManaCost": 20,
+  "Cooldown": 60,
+  "Duration": 200,
+  "Description": "Water cycle, duration spell",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1,
+    "minecraft:heart_of_the_sea": 1,
+    "minecraft:prismarine_crystals": 3
+  }
+}
