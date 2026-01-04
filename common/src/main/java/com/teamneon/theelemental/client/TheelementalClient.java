@@ -3,6 +3,8 @@ package com.teamneon.theelemental.client;
 
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
 import com.teamneon.theelemental.client.tooltip.RuneRecipeTooltipComponent;
+import com.teamneon.theelemental.menu.ModMenuTypes;
+import com.teamneon.theelemental.menu.SoulForgeScreen;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
 import net.blay09.mods.balm.client.platform.event.callback.RenderCallback;
 import net.blay09.mods.balm.client.platform.event.callback.ScreenCallback;
@@ -24,6 +26,10 @@ public class TheelementalClient {
         registrars.blockEntityRenderers(ModRenderers::initialize);
         registrars.clientTooltipComponents(ModTooltips::initialize);
 
+        registrars.menuScreens(screens -> {
+            // Use the BalmMenuTypeRegistration as the holder
+            screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
+        });
 
         RenderCallback.Gui.AFTER.register((guiGraphics, window) -> {
             Minecraft client = Minecraft.getInstance();

@@ -8,15 +8,24 @@ import com.teamneon.theelemental.helpers.SpellJsonLoader;
 import com.teamneon.theelemental.item.ModItems;
 import com.teamneon.theelemental.kingdoms.KingdomSavedData;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.menu.ModMenuTypes;
+import com.teamneon.theelemental.menu.SoulForgeMenu;
 import com.teamneon.theelemental.store.ModComponents;
 import com.teamneon.theelemental.store.RuneData;
+import net.blay09.mods.balm.Balm;
+import net.blay09.mods.balm.world.BalmMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -143,8 +152,7 @@ public class KingdomCoreInteraction {
             return InteractionResult.CONSUME;
         }
 
-        else
-        {
+        else {
             // --- Empty-hand or any other item logic ---
 
             // Only trigger teleport if player is sneaking
@@ -187,11 +195,41 @@ public class KingdomCoreInteraction {
                 return InteractionResult.CONSUME;
             }
 
-            // Normal empty-hand interaction (owner check)
+            // Normal empty-hand interaction (owner check) MAKE IN FUTURE MEMBER TOO
             if (player.getUUID().equals(core.getOwner())) {
-                player.displayClientMessage(Component.literal("You opened your Kingdom Core!"), true);
+                player.displayClientMessage(Component.literal("You opened the Kingdom Core!"), true);
+                if (!player.level().isClientSide()) {
+                    // Open the Menu using the Balm registration you created
+                    MenuProvider soulForgeProvider = new BalmMenuProvider<ModMenuTypes.SoulForgeData>() {
+                        @Override
+                        public Component getDisplayName() {
+                            return Component.translatable("container.theelemental.soul_forge");
+                        }
+
+                        @Override
+                        public AbstractContainerMenu createMenu(int id, Inventory inv, Player p) {
+                            return new SoulForgeMenu(id, inv, p);
+                        }
+
+                        @Override
+                        public ModMenuTypes.SoulForgeData getScreenOpeningData(ServerPlayer player) {
+                            // This is where you provide the data the client needs
+                            return new ModMenuTypes.SoulForgeData();
+                        }
+
+                        @Override
+                        public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.SoulForgeData> getScreenStreamCodec() {
+                            // Tell Balm how to encode the data above
+                            return ModMenuTypes.SoulForgeData.STREAM_CODEC;
+                        }
+                    };
+                    Balm.networking().openMenu(player, soulForgeProvider);
+                }
+// Now this call will NO LONGER CRASH on Fabric!
+
+
             } else {
-                player.displayClientMessage(Component.literal("You are not the owner!"), true);
+                player.displayClientMessage(Component.literal("You are not in this kingdom!"), true);
             }
 
             return InteractionResult.CONSUME;
