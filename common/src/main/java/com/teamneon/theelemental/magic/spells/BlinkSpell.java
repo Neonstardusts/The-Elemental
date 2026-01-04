@@ -9,11 +9,9 @@ import net.minecraft.world.phys.Vec3;
 
 public class BlinkSpell extends Spell {
 
-    @Override
-    public int getManaCost() { return 30; }
-
-    @Override
-    public int getCooldownTicks() { return 100; }
+    public BlinkSpell(int manaCost, int cooldownTicks) {
+        super(manaCost, cooldownTicks);
+    }
 
     // Spell-specific conditions
     @Override

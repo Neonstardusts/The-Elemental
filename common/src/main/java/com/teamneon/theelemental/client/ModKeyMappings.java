@@ -1,8 +1,10 @@
     package com.teamneon.theelemental.client;
 
     import com.mojang.blaze3d.platform.InputConstants;
+    import com.teamneon.theelemental.helpers.SpellJsonLoader;
     import com.teamneon.theelemental.magic.base.Spell;
     import com.teamneon.theelemental.magic.base.SpellCastResult;
+    import com.teamneon.theelemental.magic.network.CanCastSpellPacket;
     import com.teamneon.theelemental.magic.network.SpellCastPacket;
     import com.teamneon.theelemental.magic.base.SpellRegistry;
     import net.blay09.mods.balm.Balm;
@@ -11,6 +13,8 @@
     import net.blay09.mods.kuma.api.ManagedKeyMapping;
     import com.teamneon.theelemental.Theelemental;
     import net.minecraft.client.Minecraft;
+
+    import java.util.Map;
 
     import static com.teamneon.theelemental.Theelemental.id;
 
@@ -33,35 +37,18 @@
             castSpellKey = Kuma.createKeyMapping(id("cast_spell"))
                     .withDefault(InputBinding.key(InputConstants.KEY_N))
                     .handleWorldInput(event -> {
-                int slotIndex = ClientElementalData.getCurrentSlot();
-                int spellId = ClientElementalData.get().getActiveSlots().get(slotIndex);
+                        int slotIndex = ClientElementalData.getCurrentSlot();
+                        int spellId = ClientElementalData.get().getActiveSlots().get(slotIndex);
+                        if (spellId <= 0) return false;
 
-                if (spellId <= 0) return false;
+                        // 1️⃣ Ask server if the spell can be cast
+                        Balm.networking().sendToServer(new CanCastSpellPacket(spellId, slotIndex));
 
-                Spell spell = SpellRegistry.getSpell(spellId);
-                int currentMana = (int) ClientElementalData.get().getCurrentMana();
-                boolean onCooldown = ClientElementalData.isSpellOnCooldown(spellId);
+                        // 2️⃣ Do NOT start cooldown here — wait for server reply
+                        return true;
+                    })
+                    .build();
 
-                // 1. Test all conditions
-                SpellCastResult result = spell.checkCast(Minecraft.getInstance().player, Minecraft.getInstance().level, currentMana, onCooldown);
 
-                if (!result.isSuccess()) {
-                    if (result.getReason() != null) {
-                        Minecraft.getInstance().player.displayClientMessage(
-                                net.minecraft.network.chat.Component.literal(result.getReason()), true
-                        );
-                    }
-                    return false;
-                }
-
-                // 2. Start local cooldown
-                int duration = spell.getCooldownTicks();
-                long time = Minecraft.getInstance().level.getGameTime();
-                ClientElementalData.setLocalCooldown(spellId, duration, time);
-
-                // 3. Send packet to server
-                Balm.networking().sendToServer(new SpellCastPacket(slotIndex));
-                return true;
-            }).build();
         }
     }

@@ -5,19 +5,29 @@ import net.minecraft.world.level.Level;
 
 public abstract class Spell {
 
-    public abstract int getManaCost();
-    public abstract int getCooldownTicks();
+    protected final int manaCost;
+    protected final int cooldownTicks;
 
-    // Can be overridden for spell-specific conditions
+    protected Spell(int manaCost, int cooldownTicks) {
+        this.manaCost = manaCost;
+        this.cooldownTicks = cooldownTicks;
+    }
+
+    public int getManaCost() {
+        return manaCost;
+    }
+
+    public int getCooldownTicks() {
+        return cooldownTicks;
+    }
+
     public SpellCastResult checkConditions(Player player, Level level) {
-        // Default: always passes
         return SpellCastResult.success();
     }
 
-    // Checks mana and cooldown plus spell-specific conditions
     public SpellCastResult checkCast(Player player, Level level, int currentMana, boolean onCooldown) {
         if (onCooldown) return SpellCastResult.fail("Spell is on cooldown!");
-        if (currentMana < getManaCost()) return SpellCastResult.fail("Not enough mana!");
+        if (currentMana < manaCost) return SpellCastResult.fail("Not enough mana!");
 
         SpellCastResult conditionResult = checkConditions(player, level);
         if (!conditionResult.isSuccess()) return conditionResult;
@@ -25,6 +35,5 @@ public abstract class Spell {
         return SpellCastResult.success();
     }
 
-    // Actual spell effect
     public abstract SpellCastResult execute(Level level, Player player);
 }

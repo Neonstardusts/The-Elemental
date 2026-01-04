@@ -1,15 +1,22 @@
 package com.teamneon.theelemental.events;
 
 import com.teamneon.theelemental.block.ModBlocks;
+import com.teamneon.theelemental.client.ClientSpellInfo;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.helpers.TempBlock;
 import com.teamneon.theelemental.magic.base.ActiveSpellManager;
+import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
+import com.teamneon.theelemental.store.SpellInfoServerHelper;
 import com.teamneon.theelemental.world.spawn.PillarGenerator;
+import net.blay09.mods.balm.Balm;
+import net.blay09.mods.balm.platform.event.callback.ServerLifecycleCallback;
 import net.blay09.mods.balm.platform.event.callback.ServerPlayerCallback; // Import the structure you found
 import net.blay09.mods.balm.platform.event.callback.ServerTickCallback;
 import net.blay09.mods.balm.platform.event.callback.LevelCallback;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 
 import static net.minecraft.world.level.Level.OVERWORLD;
@@ -22,13 +29,37 @@ public class ElementalEvents {
         ServerPlayerCallback.Join.EVENT.register(player -> {
             System.out.println("!!!! [BALM OFFICIAL] Player Joined: " + player.getName().getString());
 
-            // Your Load Logic: NBT -> RAM
+            // --- 1️⃣ Load player data ---
             ElementalDataHandler.load(player);
-            // Sync data to the client (HUD update)
+
+            // --- 2️⃣ Sync player data (HUD etc.) ---
             ElementalDataHandler.syncToClient(player);
 
+            // --- 3️⃣ Generate pillars (existing code) ---
             PillarGenerator.generate(player);
+
+            // --- 4️⃣ Send SpellInfo metadata to client ---
+            ResourceManager manager = player.level().getServer().getResourceManager();
+
+            // Loop through all spells in your registry
+            for (int spellId : SpellRegistry.getAllSpellIds()) {
+                // Skip ID 0 (empty spell)
+                if (spellId <= 0) continue;
+
+                // Load the spell JSON and extract metadata
+                ClientSpellInfo info = SpellInfoServerHelper.loadSpellInfo(spellId, manager);
+
+// Send each field individually
+                Balm.networking().sendTo(player, new SyncSpellInfoPacket(
+                        info.spellId,
+                        info.name,
+                        info.manaCost,
+                        info.cooldownTicks
+                ));
+
+            }
         });
+
 
         // --- 2. Leave Event (Save Data) ---
         // We register a lambda to the official ServerPlayerCallback.Leave.EVENT

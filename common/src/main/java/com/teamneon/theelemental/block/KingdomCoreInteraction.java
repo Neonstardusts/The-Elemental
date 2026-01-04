@@ -195,8 +195,8 @@ public class KingdomCoreInteraction {
                 return InteractionResult.CONSUME;
             }
 
-            // Normal empty-hand interaction (owner check) MAKE IN FUTURE MEMBER TOO
-            if (player.getUUID().equals(core.getOwner())) {
+            // Normal empty-hand interaction if member
+            if (player.getUUID().equals(core.getOwner()) || core.getMembers().contains(player.getUUID())) {
                 player.displayClientMessage(Component.literal("You opened the Kingdom Core!"), true);
                 if (!player.level().isClientSide()) {
                     // Open the Menu using the Balm registration you created

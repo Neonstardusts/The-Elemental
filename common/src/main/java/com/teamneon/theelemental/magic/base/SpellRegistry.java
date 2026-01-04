@@ -1,52 +1,92 @@
 package com.teamneon.theelemental.magic.base;
 
+import com.teamneon.theelemental.helpers.SpellJsonLoader;
 import com.teamneon.theelemental.magic.spells.*;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class SpellRegistry {
-    // Maps the ID (1, 2, 3...) to the Spell implementation
-    private static final Map<Integer, Spell> SPELLS = new HashMap<>();
 
-    // Track spell count per element
+    private static final Map<Integer, SpellFactory> SPELLS = new HashMap<>();
     private static final Map<Integer, Integer> SPELL_COUNT = new HashMap<>();
 
-    // A fallback spell for ID 0 or invalid IDs
-    private static final Spell EMPTY = new Spell() {
-        @Override public int getManaCost() { return 0; }
-        @Override public int getCooldownTicks() { return 0; }
-        @Override public SpellCastResult execute(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player) { return SpellCastResult.fail(); }
+    private static final Spell EMPTY = new Spell(0, 0) {
+        @Override
+        public SpellCastResult execute(net.minecraft.world.level.Level level,
+                                       net.minecraft.world.entity.player.Player player) {
+            return SpellCastResult.fail();
+        }
     };
 
-    /**
-     * Call this in your Mod Initializer / Common Setup
-     */
     public static void init() {
-        // ID 0 is nothing
-        register(0, EMPTY);
-        register(1001, new FireballSpell());
-        register(8001, new BlinkSpell());
-        register(6001, new TorrentSpell());
-        register(3001, new PoisonSpraySpell());
+        register(1001, json ->
+                new FireballSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown")
+                )
+        );
+
+        register(8001, json ->
+                new BlinkSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown")
+                )
+        );
+
+        register(3001, json ->
+                new PoisonSpraySpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        intVal(json, "Duration")
+                )
+        );
+
+        register(6001, json ->
+                new TorrentSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        intVal(json, "Duration")
+                )
+        );
     }
 
-    public static void register(int id, Spell spell) {
-        SPELLS.put(id, spell);
+    public static void register(int id, SpellFactory factory) {
+        SPELLS.put(id, factory);
 
-        // Track element spell count (skip EMPTY ID 0)
         if (id != 0) {
-            int elementId = id / 1000; // e.g., 1001 / 1000 = 1 (Fire)
+            int elementId = id / 1000;
             SPELL_COUNT.put(elementId, SPELL_COUNT.getOrDefault(elementId, 0) + 1);
         }
     }
 
-    public static Spell getSpell(int id) {
-        return SPELLS.getOrDefault(id, EMPTY);
+    public static Spell createSpell(int id, Map<String, Object> json) {
+        SpellFactory factory = SPELLS.get(id);
+        return factory == null ? EMPTY : factory.create(json);
     }
 
-    /** Returns how many spells are registered for a given element */
     public static int getSpellCountForElement(int elementId) {
         return SPELL_COUNT.getOrDefault(elementId, 0);
     }
+
+    private static int intVal(Map<String, Object> json, String key) {
+        return ((Number) json.getOrDefault(key, 0)).intValue();
+    }
+
+    public static Spell getSpell(int spellId, ResourceManager manager) {
+        try {
+            Map<String, Object> json =
+                    SpellJsonLoader.getFullSpellJson(spellId, manager);
+            return createSpell(spellId, json);
+        } catch (Exception e) {
+            return EMPTY;
+        }
+    }
+
+    public static Set<Integer> getAllSpellIds() {
+        return SPELLS.keySet();
+    }
+
 }

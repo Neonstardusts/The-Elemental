@@ -1,6 +1,9 @@
 package com.teamneon.theelemental.network;
 
+import com.teamneon.theelemental.magic.network.CanCastSpellPacket;
+import com.teamneon.theelemental.magic.network.CanCastSpellResultPacket;
 import com.teamneon.theelemental.magic.network.SpellCastPacket;
+import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
 import com.teamneon.theelemental.menu.C2SAssignSpellsPacket;
 import net.blay09.mods.balm.network.BalmNetworking;
 
@@ -30,5 +33,30 @@ public class ModNetworking {
                 C2SAssignSpellsPacket.STREAM_CODEC,
                 (player, message) -> message.handle(player)
         );
+
+        // S2C: Sync spell metadata
+        networking.registerClientboundPacket(
+                SyncSpellInfoPacket.TYPE,
+                SyncSpellInfoPacket.class,
+                SyncSpellInfoPacket.STREAM_CODEC,
+                SyncSpellInfoPacket::handle
+        );
+
+        // C2S: Client asks server “can I cast this spell?”
+        networking.registerServerboundPacket(
+                CanCastSpellPacket.TYPE,
+                CanCastSpellPacket.class,
+                CanCastSpellPacket.STREAM_CODEC,
+                (player, message) -> CanCastSpellPacket.handle(message, player)
+        );
+
+// S2C: Server responds whether the cast is allowed
+        networking.registerClientboundPacket(
+                CanCastSpellResultPacket.TYPE,
+                CanCastSpellResultPacket.class,
+                CanCastSpellResultPacket.STREAM_CODEC,
+                (player, message) -> CanCastSpellResultPacket.handle(player, message)
+        );
+
     }
 }

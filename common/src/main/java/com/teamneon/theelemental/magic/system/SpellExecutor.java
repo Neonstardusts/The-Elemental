@@ -6,9 +6,51 @@ import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.Theelemental;
+import com.teamneon.theelemental.magic.network.CanCastSpellResultPacket;
+import net.blay09.mods.balm.Balm;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 public class SpellExecutor {
+    public static void tryCanCast(ServerPlayer player, int spellId, int slotIndex) {
+        Theelemental.logger.info("[tryCanCast] Received request for spellId: " + spellId + " from player: " + player.getName().getString());
+
+        ElementalData data = ElementalDataHandler.get(player);
+        if (data == null) {
+            Theelemental.logger.error("[tryCanCast] ElementalData is NULL for player: " + player.getName().getString());
+            return;
+        }
+
+        ResourceManager manager = player.level().getServer().getResourceManager();
+        Spell spell = SpellRegistry.getSpell(spellId, manager);
+
+        if (spell == null || spellId <= 0) {
+            Theelemental.logger.error("[tryCanCast] Spell not found for spellId: " + spellId);
+            return;
+        }
+
+        long currentTime = player.level().getGameTime();
+        boolean onCooldown = data.isSpellOnCooldown(spellId, currentTime);
+        int currentMana = (int) data.getCurrentMana();
+
+        Theelemental.logger.info("[tryCanCast] Player mana: " + currentMana + ", onCooldown: " + onCooldown);
+
+        SpellCastResult result = spell.checkCast(player, player.level(), currentMana, onCooldown);
+
+        Theelemental.logger.info("[tryCanCast] checkCast result: " + result.isSuccess() + " Reason: " + result.getReason());
+        // Send result back to client
+        Balm.networking().sendTo(player,
+                new CanCastSpellResultPacket(
+                        spellId,
+                        result.isSuccess() ? 1 : 0,
+                        result.getReason() != null ? result.getReason() : "",
+                        slotIndex
+                )
+        );
+
+    }
+
 
     public static void tryCast(ServerPlayer player, int slotIndex) {
         ElementalData data = ElementalDataHandler.get(player);
@@ -21,8 +63,16 @@ public class SpellExecutor {
         if (slotIndex < 0 || slotIndex >= data.getActiveSlots().size()) return;
         int spellId = data.getActiveSlots().get(slotIndex);
 
+        MinecraftServer server = player.level().getServer();
+        if (server == null) {
+            Theelemental.logger.error("Cannot cast spell: server is null for player " + player.getName().getString());
+            return;
+        }
+
+        ResourceManager manager = player.level().getServer().getResourceManager();
+
         // 2. Lookup the Spell logic
-        Spell spell = SpellRegistry.getSpell(spellId);
+        Spell spell = SpellRegistry.getSpell(spellId, manager);
         if (spellId <= 0 || spell == null) return;
 
         long currentTime = player.level().getGameTime();

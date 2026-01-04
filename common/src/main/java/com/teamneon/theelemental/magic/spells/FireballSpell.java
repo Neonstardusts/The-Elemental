@@ -10,14 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class FireballSpell extends Spell {
 
-    @Override
-    public int getManaCost() {
-        return 20;
-    }
-
-    @Override
-    public int getCooldownTicks() {
-        return 40;
+    public FireballSpell(int manaCost, int cooldownTicks) {
+        super(manaCost, cooldownTicks);
     }
 
     @Override

@@ -19,18 +19,8 @@ public class TorrentSpell extends DurationSpell {
 
     private float angle = 0f;
 
-    public TorrentSpell() {
-        super(200); // spell lasts 200 ticks
-    }
-
-    @Override
-    public int getManaCost() {
-        return 10;
-    }
-
-    @Override
-    public int getCooldownTicks() {
-        return 40;
+    public TorrentSpell(int manaCost, int cooldownTicks, long durationTicks) {
+        super(manaCost, cooldownTicks, durationTicks);
     }
 
     @Override
@@ -59,13 +49,9 @@ public class TorrentSpell extends DurationSpell {
     @Override
     public SpellCastResult execute(Level level, Player player) {
         if (!level.isClientSide()) {
-            System.out.println("[DEBUG] Casting TorrentSpell for player: " + player.getName().getString());
-            ActiveSpellManager.addSpell(player, new TorrentSpell());
-            System.out.println("[DEBUG] TorrentSpell added to ActiveSpellManager");
+            ActiveSpellManager.addSpell(player, this);
             return SpellCastResult.success();
-        } else {
-            System.out.println("[DEBUG] Execute called on client side, ignoring");
-            return SpellCastResult.fail();
         }
+        return SpellCastResult.fail();
     }
 }

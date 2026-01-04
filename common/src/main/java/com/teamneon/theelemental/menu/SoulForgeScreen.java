@@ -64,7 +64,7 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         // Parameters: Texture, X, Y, U, V, Width, Height, TextureWidth, TextureHeight
-        graphics.blit(RenderPipelines.GUI, TEXTURE, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
 
         // Visual feedback for LOCKED slots (-1)
         for (Slot slot : this.menu.slots) {
@@ -79,11 +79,48 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         // Draw standard titles
         super.renderLabels(graphics, mouseX, mouseY);
+        // 1. Render Spell Icons BELOW Forge Slots
+        for (int i = 0; i < 8; i++) {
+            Slot slot = this.menu.getSlot(i);
+            ItemStack stack = slot.getItem();
+
+            if (!stack.isEmpty()) {
+                RuneData data = stack.get(ModComponents.rune.value());
+                if (data != null && data.spellId() > 0) {
+                    // Determine icon path based on spellId
+                    Identifier spellIcon = id("textures/gui/spell_icons/" + data.spellId() + ".png");
+
+                    // Render icon 20 pixels below the slot (adjust as needed)
+                    // Use 16x16 size to match slot dimensions
+                    graphics.blit(RenderPipelines.GUI_TEXTURED, spellIcon, slot.x, slot.y + 20, 0, 0, 16, 16, 16, 16);
+                }
+            }
+        }
 
         // Display Player Stats from RAM
         var data = ClientElementalData.get();
-        graphics.drawString(this.font, "Level: " + data.getLevel(), 8, 20, 0x404040, false);
-        graphics.drawString(this.font, "Mana: " + (int)data.getCurrentMana() + "/" + data.getMaxMana(), 8, 30, 0x404040, false);
+
+        // 2. Render Current Active Slots ABOVE the GUI
+        List<Integer> activeSpells = data.getActiveSlots(); // Assuming this returns the 8 spell IDs
+
+        int previewStartX = 8;
+        int previewY = -25; // 25 pixels above the top of the GUI
+
+        graphics.drawString(this.font, "Current Spells:", previewStartX, previewY - 10, 0xFFFFFFFF);
+
+        for (int i = 0; i < activeSpells.size(); i++) {
+            int spellId = activeSpells.get(i);
+            if (spellId > 0) {
+                Identifier spellIcon = id("textures/gui/spell_icons/" + spellId + ".png");
+                graphics.blit(RenderPipelines.GUI_TEXTURED, spellIcon, previewStartX + (i * 20), previewY, 0, 0, 16, 16, 16, 16);
+            } else {
+                // Optional: Render an empty slot/placeholder for ID 0
+                graphics.fill(previewStartX + (i * 20), previewY, previewStartX + (i * 20) + 16, previewY + 16, 0x44FFFFFF);
+            }
+        }
+
+        graphics.drawString(this.font, "Level: " + data.getLevel(), 8, 20, 0xFF404040, false);
+        graphics.drawString(this.font, "Mana: " + (int)data.getCurrentMana() + "/" + data.getMaxMana(), 8, 30, 0xFF404040, false);
     }
 
     @Override
