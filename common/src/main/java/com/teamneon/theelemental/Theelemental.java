@@ -8,6 +8,7 @@ import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.network.ModNetworking;
 import com.teamneon.theelemental.network.SyncElementalDataPacket;
+import com.teamneon.theelemental.store.ModComponents;
 import com.teamneon.theelemental.worldcrafter.ModRecipes;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
@@ -38,14 +39,19 @@ public class Theelemental {
         ElementalEvents.register();
 
         // ---- REGISTRIES ----
+        registrars.dataComponentTypes(ModComponents::initialize);
+
         registrars.blocks(ModBlocks::initialize);
         registrars.items(ModItems::initialize);
         registrars.creativeModeTabs(ModItems::initialize);
         registrars.blockEntityTypes(ModBlockEntities::initialize);
         registrars.menuTypes(ModMenuTypes::initialize);
 
+
+
         SpellRegistry.init();
         ModRecipes.register();
+
         // Use the registrar to handle networking
         // If registrars.networking exists, use it. Otherwise, use Balm.networking()
         ModNetworking.initialize(Balm.networking());

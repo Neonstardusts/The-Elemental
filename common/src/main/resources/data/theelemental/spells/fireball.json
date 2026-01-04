@@ -1,7 +1,0 @@
-{
-  "type": "theelemental:fireball",
-  "mana_cost": 20,
-  "cooldown": 40,
-  "icon": "theelemental:spell_icons/fireball",
-  "cast_time": 0
-}

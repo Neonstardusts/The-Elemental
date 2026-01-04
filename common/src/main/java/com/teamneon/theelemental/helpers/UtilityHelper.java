@@ -3,6 +3,8 @@ package com.teamneon.theelemental.helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustColorTransitionOptions;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
@@ -145,4 +147,145 @@ public class UtilityHelper {
                 dx, dy, dz, speed // spread x,y,z + speed
         );
     }
+
+
+
+    public static String toSmallCaps(String input) {
+        if (input == null) return "";
+
+        String normal = "abcdefghijklmnopqrstuvwxyz";
+        String smallCaps = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ";
+
+        StringBuilder builder = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            int index = normal.indexOf(Character.toLowerCase(c));
+            if (index != -1) {
+                builder.append(smallCaps.charAt(index));
+            } else {
+                builder.append(c); // Keep numbers, spaces, and punctuation as they are
+            }
+        }
+        return builder.toString();
+    }
+
+    public static Component getGradientComponent(String text, int colorStart, int colorEnd) {
+        MutableComponent container = Component.empty();
+        int length = text.length();
+
+        // Prevent division by zero for single-character names
+        if (length <= 1) {
+            return Component.literal(text).withStyle(style -> style.withColor(colorStart));
+        }
+
+        for (int i = 0; i < length; i++) {
+            // Calculate how far we are through the string (0.0 to 1.0)
+            float ratio = (float) i / (float) (length - 1);
+
+            // Extract RGB channels for Start color
+            int r1 = (colorStart >> 16) & 0xFF;
+            int g1 = (colorStart >> 8) & 0xFF;
+            int b1 = colorStart & 0xFF;
+
+            // Extract RGB channels for End color
+            int r2 = (colorEnd >> 16) & 0xFF;
+            int g2 = (colorEnd >> 8) & 0xFF;
+            int b2 = colorEnd & 0xFF;
+
+            // Linearly interpolate between the two colors
+            int r = (int) (r1 + ratio * (r2 - r1));
+            int g = (int) (g1 + ratio * (g2 - g1));
+            int b = (int) (b1 + ratio * (b2 - b1));
+
+            int blendedColor = (r << 16) | (g << 8) | b;
+
+            // Append each character with its specific blended color
+            container.append(Component.literal(String.valueOf(text.charAt(i)))
+                    .withStyle(style -> style.withColor(blendedColor)));
+        }
+
+        return container;
+    }
+
+    public static int darkShiftColor(int color, float amount) {
+        float factor = 1 - amount; // 50% darker
+
+        int r = (int)(((color >> 16) & 0xFF) * factor);
+        int g = (int)(((color >> 8) & 0xFF) * factor);
+        int b = (int)((color & 0xFF) * factor);
+
+        int color2 = (r << 16) | (g << 8) | b;
+
+        return color2;
+    }
+
+    public static int desaturateColor(int color, float amount) {
+        // Clamp amount between 0 (no change) and 1 (fully desaturated)
+        amount = Math.max(0f, Math.min(1f, amount));
+
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+        // Calculate grayscale luminance using standard coefficients
+        int gray = (int)(0.299f * r + 0.587f * g + 0.114f * b);
+
+        // Interpolate between original color and gray
+        r = (int)(r * (1 - amount) + gray * amount);
+        g = (int)(g * (1 - amount) + gray * amount);
+        b = (int)(b * (1 - amount) + gray * amount);
+
+        return (r << 16) | (g << 8) | b;
+    }
+
+
+    public static int hueShiftColor(int color, float amount) {
+        // Extract RGB
+        float r = ((color >> 16) & 0xFF) / 255f;
+        float g = ((color >> 8) & 0xFF) / 255f;
+        float b = (color & 0xFF) / 255f;
+
+        // Hue rotation matrix
+        float cosA = (float) Math.cos(amount * 2 * Math.PI);
+        float sinA = (float) Math.sin(amount * 2 * Math.PI);
+
+        float newR = 0.299f + 0.701f * cosA + 0.168f * sinA;
+        float newG = 0.587f - 0.587f * cosA + 0.330f * sinA;
+        float newB = 0.114f - 0.114f * cosA - 0.497f * sinA;
+
+        float r2 = clamp(newR * r + newG * g + newB * b);
+        float g2 = clamp(newR * r + newG * g + newB * b); // will adjust below
+        float b2 = clamp(newR * r + newG * g + newB * b); // will adjust below
+
+        // Quick fix: use proper rotation matrix for RGB to preserve brightness
+        float newR2 = clamp((0.299f + 0.701f * cosA + 0.168f * sinA) * r +
+                (0.587f - 0.587f * cosA + 0.330f * sinA) * g +
+                (0.114f - 0.114f * cosA - 0.497f * sinA) * b);
+
+        float newG2 = clamp((0.299f - 0.299f * cosA - 0.328f * sinA) * r +
+                (0.587f + 0.413f * cosA + 0.035f * sinA) * g +
+                (0.114f - 0.114f * cosA + 0.292f * sinA) * b);
+
+        float newB2 = clamp((0.299f - 0.3f * cosA + 1.25f * sinA) * r +
+                (0.587f - 0.588f * cosA - 1.05f * sinA) * g +
+                (0.114f + 0.886f * cosA - 0.203f * sinA) * b);
+
+        // Convert back to integer
+        int R = (int) (newR2 * 255);
+        int G = (int) (newG2 * 255);
+        int B = (int) (newB2 * 255);
+
+        return (R << 16) | (G << 8) | B;
+    }
+
+    private static float clamp(float v) {
+        return Math.max(0f, Math.min(1f, v));
+    }
+
+    public static float randomFromStringRange(String s, float min, float max) {
+        int hash = s.hashCode();
+        float r = ((hash & 0xFFFFFFFFL) / (float)0x100000000L); // 0..1
+        return min + (max - min) * r; // scale to min..max
+    }
+
+
 }

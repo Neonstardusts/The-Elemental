@@ -1,18 +1,19 @@
 package com.teamneon.theelemental.block;
 
 import com.mojang.serialization.MapCodec;
+import com.teamneon.theelemental.Theelemental;
 import com.teamneon.theelemental.block.entity.WorldCrafterEntity;
 import com.teamneon.theelemental.block.entity.WorldCrafterPillarEntity;
+import com.teamneon.theelemental.item.ElementRune;
+import com.teamneon.theelemental.item.ModItems;
+import com.teamneon.theelemental.store.ModComponents;
+import com.teamneon.theelemental.store.RuneData;
 import com.teamneon.theelemental.worldcrafter.WorldCrafterRecipe;
-import net.blay09.mods.balm.Balm;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -27,15 +28,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.teamneon.theelemental.helpers.KingdomAnchorHelper.NUM_PILLARS;
 import static com.teamneon.theelemental.helpers.KingdomAnchorHelper.RADIUS;
 
-
 public class WorldCrafter extends BaseEntityBlock {
+
     public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
     public static final MapCodec<WorldCrafter> CODEC = simpleCodec(WorldCrafter::new);
 
@@ -53,8 +52,6 @@ public class WorldCrafter extends BaseEntityBlock {
         return CODEC;
     }
 
-    /* BLOCK ENTITY */
-
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
@@ -62,65 +59,163 @@ public class WorldCrafter extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new WorldCrafterEntity(blockPos, blockState);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new WorldCrafterEntity(pos, state);
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit
+    ) {
 
-        if (!(level.getBlockEntity(pos) instanceof WorldCrafterEntity worldCrafterEntity)) {
+        if (!(level.getBlockEntity(pos) instanceof WorldCrafterEntity worldCrafter)) {
             return InteractionResult.PASS;
         }
 
-        // Sneak-right-click triggers the crafting
+        /* ============================================================
+           SHIFT-RIGHT-CLICK : CRAFTING
+           ============================================================ */
         if (player.isShiftKeyDown()) {
 
-            ItemStack centralStack = worldCrafterEntity.inventory.getItem(0);
-            if (!centralStack.isEmpty()) {
-                // Gather items from pillars
+            ItemStack centralStack = worldCrafter.inventory.getItem(0);
+            Theelemental.logger.warn("[WorldCrafter] Shift-right-click at {}", pos);
+
+            /* ---------------- RUNE CRAFTING ---------------- */
+            if (centralStack.getItem() instanceof ElementRune) {
+
+                if (!centralStack.has(ModComponents.rune.value())) {
+                    Theelemental.logger.warn("[WorldCrafter] Rune has NO RuneData");
+                    return InteractionResult.SUCCESS;
+                }
+
+                RuneData runeData = centralStack.get(ModComponents.rune.value());
+                if (runeData.recipeItems().isEmpty()) {
+                    Theelemental.logger.warn("[WorldCrafter] Rune recipe EMPTY");
+                    return InteractionResult.SUCCESS;
+                }
+
+                // Collect pillar items
                 List<ItemStack> pillarItems = new ArrayList<>();
-                BlockPos altarPos = pos;
+
                 for (int i = 0; i < NUM_PILLARS; i++) {
                     double angle = 2 * Math.PI / NUM_PILLARS * i;
-                    int x = altarPos.getX() + (int) Math.round(Math.cos(angle) * RADIUS);
-                    int z = altarPos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS);
-                    int y = altarPos.getY();
-                    BlockPos pillarPos = new BlockPos(x, y, z);
+                    BlockPos pillarPos = new BlockPos(
+                            pos.getX() + (int) Math.round(Math.cos(angle) * RADIUS),
+                            pos.getY(),
+                            pos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS)
+                    );
 
                     if (level.getBlockEntity(pillarPos) instanceof WorldCrafterPillarEntity pillar) {
-                        ItemStack stackInPillar = pillar.inventory.getItem(0);
-                        if (!stackInPillar.isEmpty()) {
-                            pillarItems.add(stackInPillar.copy());
+                        ItemStack pillarStack = pillar.inventory.getItem(0);
+                        if (!pillarStack.isEmpty()) {
+                            pillarItems.add(pillarStack.copy());
                         }
                     }
                 }
 
-                // Combine central + pillar items
-                List<ItemStack> craftingInputs = new ArrayList<>();
-                craftingInputs.add(centralStack.copy());
-                craftingInputs.addAll(pillarItems);
+                // Build multiset
+                Map<String, Integer> available = new HashMap<>();
+                for (ItemStack pillarStack : pillarItems) {
+                    String id = pillarStack.getItem()
+                            .builtInRegistryHolder()
+                            .key()
+                            .identifier()
+                            .toString();
 
-                // Run your recipe check / crafting logic
-                Optional<ItemStack> result = WorldCrafterRecipe.findMatchingRecipe(craftingInputs);
+                    available.merge(id, pillarStack.getCount(), Integer::sum);
+                }
+
+                // Match recipe
+                for (var entry : runeData.recipeItems().entrySet()) {
+                    String id = entry.getKey();
+                    int needed = entry.getValue();
+
+                    int have = available.getOrDefault(id, 0);
+                    if (have < needed) {
+                        return InteractionResult.SUCCESS;
+                    }
+                    available.put(id, have - needed);
+                }
+
+                // Reject extras
+                if (available.values().stream().anyMatch(v -> v > 0)) {
+                    return InteractionResult.SUCCESS;
+                }
+
+                // Craft result
+                ItemStack result = new ItemStack(ModItems.SPELL_RUNE.asItem());
+                result.set(ModComponents.rune.value(), runeData);
+
+                if (!player.getInventory().add(result)) {
+                    player.drop(result, false);
+                }
+
+                // Clear central + pillars
+                worldCrafter.inventory.setItem(0, ItemStack.EMPTY);
+                worldCrafter.setChanged();
+
+                for (int i = 0; i < NUM_PILLARS; i++) {
+                    double angle = 2 * Math.PI / NUM_PILLARS * i;
+                    BlockPos pillarPos = new BlockPos(
+                            pos.getX() + (int) Math.round(Math.cos(angle) * RADIUS),
+                            pos.getY(),
+                            pos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS)
+                    );
+
+                    if (level.getBlockEntity(pillarPos) instanceof WorldCrafterPillarEntity pillar) {
+                        pillar.inventory.setItem(0, ItemStack.EMPTY);
+                        pillar.setChanged();
+                    }
+                }
+
+                level.playSound(player, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1f, 1f);
+                return InteractionResult.SUCCESS;
+            }
+
+            /* ---------------- NORMAL CRAFTING ---------------- */
+            if (!centralStack.isEmpty()) {
+
+                List<ItemStack> inputs = new ArrayList<>();
+                inputs.add(centralStack.copy());
+
+                for (int i = 0; i < NUM_PILLARS; i++) {
+                    double angle = 2 * Math.PI / NUM_PILLARS * i;
+                    BlockPos pillarPos = new BlockPos(
+                            pos.getX() + (int) Math.round(Math.cos(angle) * RADIUS),
+                            pos.getY(),
+                            pos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS)
+                    );
+
+                    if (level.getBlockEntity(pillarPos) instanceof WorldCrafterPillarEntity pillar) {
+                        ItemStack pillarStack = pillar.inventory.getItem(0);
+                        if (!pillarStack.isEmpty()) {
+                            inputs.add(pillarStack.copy());
+                        }
+                    }
+                }
+
+                Optional<ItemStack> result = WorldCrafterRecipe.findMatchingRecipe(inputs);
                 result.ifPresent(resultStack -> {
-                    // Output result to player
                     if (!player.getInventory().add(resultStack)) {
                         player.drop(resultStack, false);
                     }
 
-                    // Clear the central crafter
-                    worldCrafterEntity.inventory.setItem(0, ItemStack.EMPTY);
-                    worldCrafterEntity.setChanged();
+                    worldCrafter.inventory.setItem(0, ItemStack.EMPTY);
+                    worldCrafter.setChanged();
 
-                    // Clear all pillar inventories
                     for (int i = 0; i < NUM_PILLARS; i++) {
                         double angle = 2 * Math.PI / NUM_PILLARS * i;
-                        int x = altarPos.getX() + (int) Math.round(Math.cos(angle) * RADIUS);
-                        int z = altarPos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS);
-                        int y = altarPos.getY();
-                        BlockPos pillarPos = new BlockPos(x, y, z);
+                        BlockPos pillarPos = new BlockPos(
+                                pos.getX() + (int) Math.round(Math.cos(angle) * RADIUS),
+                                pos.getY(),
+                                pos.getZ() + (int) Math.round(Math.sin(angle) * RADIUS)
+                        );
 
                         if (level.getBlockEntity(pillarPos) instanceof WorldCrafterPillarEntity pillar) {
                             pillar.inventory.setItem(0, ItemStack.EMPTY);
@@ -134,18 +229,21 @@ public class WorldCrafter extends BaseEntityBlock {
                 return InteractionResult.SUCCESS;
             }
 
-        } else {
-            // Normal right-click behavior (place/remove item)
-            if (worldCrafterEntity.inventory.getItem(0).isEmpty() && !stack.isEmpty()) {
-                worldCrafterEntity.inventory.setItem(0, stack.copy());
-                stack.shrink(1);
-                level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
-            } else if (stack.isEmpty()) {
-                ItemStack stackOnPedestal = worldCrafterEntity.inventory.removeItem(0, 1);
-                player.setItemInHand(hand, stackOnPedestal);
-                worldCrafterEntity.clearContents();
-                level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 1f);
-            }
+            return InteractionResult.SUCCESS;
+        }
+
+        /* ============================================================
+           NORMAL RIGHT CLICK (PLACE / REMOVE)
+           ============================================================ */
+        if (worldCrafter.inventory.getItem(0).isEmpty() && !stack.isEmpty()) {
+            worldCrafter.inventory.setItem(0, stack.copy());
+            stack.shrink(1);
+            level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
+        } else if (stack.isEmpty()) {
+            ItemStack taken = worldCrafter.inventory.removeItem(0, 1);
+            player.setItemInHand(hand, taken);
+            worldCrafter.clearContents();
+            level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 1f);
         }
 
         return InteractionResult.SUCCESS;

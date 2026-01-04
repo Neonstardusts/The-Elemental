@@ -4,10 +4,16 @@ import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.helpers.ElementRegistry;
+import com.teamneon.theelemental.helpers.SpellJsonLoader;
+import com.teamneon.theelemental.item.ModItems;
 import com.teamneon.theelemental.kingdoms.KingdomSavedData;
+import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.store.ModComponents;
+import com.teamneon.theelemental.store.RuneData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -60,7 +66,85 @@ public class KingdomCoreInteraction {
 
             player.displayClientMessage(Component.literal("Your mana increased by 10!"), true);
             return InteractionResult.CONSUME;
-        } else {
+        } else if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
+            // Get player's elemental data
+            ElementalData data = ElementalDataHandler.get(player);
+
+            // Element of the Kingdom Core
+            int elementId = core.getElement();
+
+            // 1. Generate a random SpellID for this element
+            int baseId = elementId * 1000; // e.g., Fire = 1000, Water = 2000
+            int maxSpells = SpellRegistry.getSpellCountForElement(elementId); // total number of spells for this element
+
+            if (maxSpells <= 0) {
+                player.displayClientMessage(Component.literal("No spells registered for this element!"), true);
+                return InteractionResult.FAIL;
+            }
+
+            int randomOffset = (int) (Math.random() * maxSpells) + 1; // +1 so 1001 instead of 1000
+            int spellId = baseId + randomOffset;
+
+            // 2. Lookup the RecipeItems JSON for this spell
+            Map<String, Integer> recipeItems;
+            try {
+                recipeItems = SpellJsonLoader.getRecipeForSpell(spellId, world.getServer().getResourceManager());
+            } catch (Exception e) {
+                player.displayClientMessage(Component.literal("Failed to load recipe for spell " + spellId), true);
+                return InteractionResult.FAIL;
+            }
+
+            if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer) {
+                // Get the ResourceManager
+                var manager = serverPlayer.level().getServer().getResourceManager();
+
+                // 3. Transform Blank Rune into Element Rune
+                ItemStack elementRune = new ItemStack(ModItems.ELEMENT_RUNE.asItem());
+
+                try {
+                    // Read JSON for the spell
+                    Map<String, Object> spellJson = SpellJsonLoader.getFullSpellJson(spellId, manager);
+                    String spellName = (String) spellJson.getOrDefault("SpellName", "Unknown Spell");
+                    Number manaNum = (Number) spellJson.getOrDefault("ManaCost", 0);
+                    int manaCost = manaNum.intValue();
+                    Number cooldownNum = (Number) spellJson.getOrDefault("Cooldown", 0);
+                    int cooldown = cooldownNum.intValue();
+                    String description = (String) spellJson.getOrDefault("Description", "No description");
+
+                    // Create RuneData with spellName
+                    RuneData runeData = new RuneData(elementId, spellId, spellName, recipeItems, manaCost, cooldown, description);
+
+                    // Attach component to ItemStack
+                    elementRune.set(ModComponents.rune.value(), runeData);
+
+                    // Give player the Element Rune
+                    stack.shrink(1); // remove Blank Rune
+                    if (!player.getInventory().add(elementRune)) {
+                        player.drop(elementRune, false);
+                    }
+
+                    // Give player the Element Rune
+                    stack.shrink(1); // remove Blank Rune
+                    if (!player.getInventory().add(elementRune)) {
+                        player.drop(elementRune, false);
+                    }
+
+                    player.displayClientMessage(Component.literal("Your Rune has been attuned! Spell: " + spellName), true);
+
+                } catch (Exception e) {
+                    // Handle missing/invalid JSON
+                    player.displayClientMessage(Component.literal("Failed to load spell JSON for spell " + spellId), true);
+                    e.printStackTrace(); // Log for debugging
+                }
+            }
+
+
+            player.displayClientMessage(Component.literal("Your Blank Rune has been attuned! SpellID: " + spellId), true);
+            return InteractionResult.CONSUME;
+        }
+
+        else
+        {
             // --- Empty-hand or any other item logic ---
 
             // Only trigger teleport if player is sneaking

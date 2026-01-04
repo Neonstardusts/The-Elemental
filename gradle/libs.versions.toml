@@ -1,6 +1,7 @@
 [versions]
 # See https://maven.twelveiterations.com/service/rest/repository/browse/maven-public/net/blay09/mods/balm-common/
-balm = "21.11.3"
+balm = "21.11.4-SNAPSHOT"
+
 minecraft = "1.21.11"
 # See https://projects.neoforged.net/neoforged/neoform
 neoForm = "1.21.11-20251209.172050"
