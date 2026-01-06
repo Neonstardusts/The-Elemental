@@ -39,7 +39,7 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
         // Add the "Assign Spells" Button
         this.addRenderableWidget(Button.builder(Component.literal("Assign"), (btn) -> {
             this.sendAssignmentPacket();
-        }).bounds(this.leftPos + 60, this.topPos + 40, 56, 20).build());
+        }).bounds(this.leftPos + 60, this.topPos + 60, 56, 20).build());
     }
 
     private void sendAssignmentPacket() {
@@ -103,7 +103,7 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
         // 2. Render Current Active Slots ABOVE the GUI
         List<Integer> activeSpells = data.getActiveSlots(); // Assuming this returns the 8 spell IDs
 
-        int previewStartX = 8;
+        int previewStartX = 10;
         int previewY = -25; // 25 pixels above the top of the GUI
 
         graphics.drawString(this.font, "Current Spells:", previewStartX, previewY - 10, 0xFFFFFFFF);
@@ -119,8 +119,48 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
             }
         }
 
-        graphics.drawString(this.font, "Level: " + data.getLevel(), 8, 20, 0xFF404040, false);
-        graphics.drawString(this.font, "Mana: " + (int)data.getCurrentMana() + "/" + data.getMaxMana(), 8, 30, 0xFF404040, false);
+        //DRAW INFORMATION
+        String playerName = this.minecraft.player.getName().getString();
+
+        graphics.drawString(this.font, playerName, 8+176, 20, 0xFFFFFFFF, false);
+        int x = 8 + 176;
+        int y = 30;
+
+// Colors
+        int BLUE = 0xFF6f9eb3;
+        int GRAY = 0xFF8a8a8a;
+        int YELLOW = 0xFFc7bb83;
+
+// ★ star (blue)
+        graphics.drawString(this.font, "★ ", x, y, BLUE, false);
+        x += this.font.width("★ ");
+
+// "Mana" (gray)
+        graphics.drawString(this.font, "Mana ", x, y, GRAY, false);
+        x += this.font.width("Mana ");
+
+// Mana amount (blue)
+        String manaText = (int)data.getCurrentMana() + "/" + data.getMaxMana();
+        graphics.drawString(this.font, manaText, x, y, BLUE, false);
+
+        x = 8 + 176;
+        // ✦ icon (blue)
+        graphics.drawString(this.font, "✦ ", x, y+10, YELLOW, false);
+        x += this.font.width("✦ ");
+
+// "Level" (gray)
+        graphics.drawString(this.font, "Level ", x, y+10, GRAY, false);
+        x += this.font.width("Level ");
+
+// Level number (blue)
+        graphics.drawString(
+                this.font,
+                String.valueOf(data.getLevel()),
+                x,
+                y+10,
+                YELLOW,
+                false
+        );
     }
 
     @Override

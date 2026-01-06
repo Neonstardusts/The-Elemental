@@ -27,14 +27,14 @@ public class SoulForgeMenu extends AbstractContainerMenu {
 
         // 1. Add Soul Forge Slots (8 slots)
         for (int i = 0; i < 8; i++) {
-            this.addSlot(new SoulForgeSlot(forgeContainer, i, 8 + (i * 18), 20, i, slotStates));
+            this.addSlot(new SoulForgeSlot(forgeContainer, i, 10 + (i * 20), 20, i, slotStates));
         }
 
         // 2. Add Player Inventory (Standard positions)
         // Changed Y from 51 to 84
                 for (int row = 0; row < 3; row++) {
                     for (int col = 0; col < 9; col++) {
-                        this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 86 + row * 18));
+                        this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 87 + row * 18));
                     }
                 }
 
