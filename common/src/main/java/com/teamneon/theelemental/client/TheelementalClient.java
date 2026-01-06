@@ -2,7 +2,9 @@ package com.teamneon.theelemental.client;
 
 
 import com.mojang.serialization.MapCodec;
+import com.teamneon.theelemental.block.ModBlocks;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
+import com.teamneon.theelemental.helpers.ElementRegistry;
 import com.teamneon.theelemental.item.property.ElementIdProperty;
 import com.teamneon.theelemental.item.property.SpellVariantProperty;
 import com.teamneon.theelemental.menu.ModMenuTypes;
@@ -11,8 +13,12 @@ import net.blay09.mods.balm.client.BalmClientRegistrars;
 import net.blay09.mods.balm.client.platform.event.callback.RenderCallback;
 import net.blay09.mods.balm.client.platform.event.callback.ScreenCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static com.teamneon.theelemental.Theelemental.id;
+import static com.teamneon.theelemental.block.KingdomAnchor.ELEMENT;
+
 
 
 public class TheelementalClient {
@@ -23,9 +29,29 @@ public class TheelementalClient {
         registrars.blockEntityRenderers(ModRenderers::initialize);
         registrars.clientTooltipComponents(ModTooltips::initialize);
 
+
+
         registrars.menuScreens(screens -> {
             // Use the BalmMenuTypeRegistration as the holder
             screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
+        });
+
+        registrars.blockColors(colors -> {
+            colors.register(
+                    (state, level, pos, tintIndex) -> {
+                        int element = state.getValue(ELEMENT);
+                        return ElementRegistry.getColor(element) & 0xFFFFFF;
+                    },
+                    ModBlocks.KINGDOM_ANCHOR
+            );
+
+            colors.register(
+                    (state, level, pos, tintIndex) -> {
+                        int element = state.getValue(ELEMENTCore);
+                        return ElementRegistry.getColor(element) & 0xFFFFFF;
+                    },
+                    ModBlocks.KINGDOM_CORE
+            );
         });
 
 
@@ -52,6 +78,7 @@ public class TheelementalClient {
                 }
             }
         });
+
 
 
     }

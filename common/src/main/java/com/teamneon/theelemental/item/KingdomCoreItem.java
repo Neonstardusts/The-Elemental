@@ -1,5 +1,7 @@
 package com.teamneon.theelemental.item;
 
+import com.teamneon.theelemental.block.KingdomAnchor;
+import com.teamneon.theelemental.block.KingdomCoreBlock;
 import com.teamneon.theelemental.block.ModBlocks;
 import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
 import com.teamneon.theelemental.data.ElementalDataHandler;
@@ -16,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Set;
 import java.util.UUID;
@@ -84,7 +87,7 @@ public class KingdomCoreItem extends Item {
                 if (player instanceof ServerPlayer serverPlayer) {
                     teleportToNearestSafeSpot(serverPlayer, existingCorePos.getX(), existingCorePos.getY(), existingCorePos.getZ(), ElementRegistry.getColor(playerElement));
                 }
-
+//updated
                 context.getItemInHand().shrink(1);
                 return InteractionResult.SUCCESS;
             }
@@ -98,11 +101,24 @@ public class KingdomCoreItem extends Item {
 
         // Otherwise, create the kingdom
         BlockPos corePos = clickedPos.above();
-        serverLevel.setBlock(corePos, ModBlocks.KINGDOM_CORE.defaultBlockState(), 3);
+        serverLevel.setBlock(
+                corePos,
+                ModBlocks.KINGDOM_CORE
+                        .defaultBlockState()
+                        .setValue(KingdomCoreBlock.ELEMENT, playerElement),
+                3
+        );
         globalData.registerCore(playerElement, corePos);
         BlockPos anchorPos = KingdomAnchorHelper.getAnchorPos(serverLevel, playerElement);
         if (anchorPos != null) {
-            serverLevel.setBlock(anchorPos, ModBlocks.KINGDOM_ANCHOR.defaultBlockState(), 3);
+            serverLevel.setBlock(
+                    anchorPos,
+                    ModBlocks.KINGDOM_ANCHOR
+                            .defaultBlockState()
+                            .setValue(KingdomAnchor.ELEMENT, playerElement),
+                    3
+            );
+
         }
 
         if (serverLevel.getBlockEntity(corePos) instanceof KingdomCoreBlockEntity core) {

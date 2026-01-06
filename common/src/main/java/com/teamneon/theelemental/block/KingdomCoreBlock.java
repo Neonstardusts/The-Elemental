@@ -11,13 +11,26 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class KingdomCoreBlock extends Block implements EntityBlock {
 
+    public static final IntegerProperty ELEMENTCore =
+            IntegerProperty.create("elementcore", 0, 9);
+
     public KingdomCoreBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(ELEMENTCore, 0)
+        );
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ELEMENTCore);
     }
 
     @Override

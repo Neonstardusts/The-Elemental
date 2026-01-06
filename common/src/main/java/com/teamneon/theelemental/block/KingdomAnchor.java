@@ -16,11 +16,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.*;
@@ -39,9 +42,23 @@ public class KingdomAnchor extends Block {
         int clickCount;
     }
 
+    public static final IntegerProperty ELEMENT =
+            IntegerProperty.create("element", 0, 9);
+
     public KingdomAnchor(BlockBehaviour.Properties properties) {
+
         super(properties);
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(ELEMENT, 0)
+        );
     }
+
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ELEMENT);
+    }
+
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
@@ -94,5 +111,6 @@ public class KingdomAnchor extends Block {
         int color = ElementRegistry.getColor(getElementFromAnchor(level, pos));
         UtilityHelper.spawnDust(level, pos.getX()+0.5, pos.getY()+10.5, pos.getZ()+0.5, color, 50,0.5, 0.75, 0.5, 0.02, 3);
     }
+
 
 }
