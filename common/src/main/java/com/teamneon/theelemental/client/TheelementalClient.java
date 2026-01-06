@@ -28,6 +28,7 @@ public class TheelementalClient {
             screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
         });
 
+
         registrars.rangeSelectItemModelProperties(properties -> {
             // "theelemental:element_id" matches the "property" key in your JSON
             properties.register(
