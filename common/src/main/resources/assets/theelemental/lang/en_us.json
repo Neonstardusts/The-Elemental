@@ -11,5 +11,10 @@
   "item.theelemental.wind_feather": "Wind Feather",
   "item.theelemental.unknownspellrune": "Unknown Spell Rune",
   "item.theelemental.rune_blank": "Elemental Amalgam",
-  "itemGroup.theelemental.theelemental": "The Elemental Mod"
+  "itemGroup.theelemental.theelemental": "The Elemental Mod",
+  "container.theelemental.soul_forge": "Soul Forge",
+  "key.category.theelemental.default": "The Elemental Keybinds",
+  "key.category.theelemental.cast_spell": "Cast Spell",
+  "key.category.theelemental.cycle_slot": "Next Spell",
+  "item.theelemental.kingdom_starter": "Kingdom Starter"
 }

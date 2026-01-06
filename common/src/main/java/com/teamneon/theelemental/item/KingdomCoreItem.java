@@ -18,6 +18,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import java.util.Set;
+import java.util.UUID;
+
+import static com.teamneon.theelemental.helpers.UtilityHelper.teleportToNearestSafeSpot;
 
 public class KingdomCoreItem extends Item {
 
@@ -46,27 +49,47 @@ public class KingdomCoreItem extends Item {
 
         // Kingdom exists? Teleport player to it
         if (existingCorePos != null) {
-            player.displayClientMessage(Component.literal("Kingdom already exists! Teleporting and joining..."), true);
-
             if (serverLevel.getBlockEntity(existingCorePos) instanceof KingdomCoreBlockEntity core) {
-                core.addMember(player.getUUID());
-            }
 
-            if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.teleportTo(
-                        serverLevel,
-                        existingCorePos.getX() + 0.5,
-                        existingCorePos.getY() + 1.0,
-                        existingCorePos.getZ() + 0.5,
-                        Set.of(Relative.X_ROT, Relative.Y_ROT),
-                        serverPlayer.getYRot(),
-                        serverPlayer.getXRot(),
+                UUID playerId = player.getUUID();
+
+                // Check if player is already a member
+                if (core.getMembers().contains(playerId)) {
+                    player.displayClientMessage(
+                            Component.literal("You are already a member of this Kingdom!"),
+                            true
+                    );
+                    return InteractionResult.FAIL; // Stop here if already a member
+                }
+
+                // Player is not a member yet, add them
+                core.addMember(playerId);
+
+                player.displayClientMessage(
+                        Component.literal("Kingdom already exists! Teleporting and joining..."),
+                        true
+                );
+
+                serverLevel.getServer().getPlayerList().broadcastSystemMessage(
+                        Component.literal(
+                                player.getName().getString()
+                                        + " has joined the "
+                                        + ElementRegistry.getName(playerElement)
+                                        + " Kingdom!"
+                        ),
                         false
                 );
-            }
 
-            return InteractionResult.SUCCESS;
+
+                if (player instanceof ServerPlayer serverPlayer) {
+                    teleportToNearestSafeSpot(serverPlayer, existingCorePos.getX(), existingCorePos.getY(), existingCorePos.getZ(), ElementRegistry.getColor(playerElement));
+                }
+
+                context.getItemInHand().shrink(1);
+                return InteractionResult.SUCCESS;
+            }
         }
+
 
         if (!serverLevel.dimension().equals(Level.OVERWORLD)) {
             player.displayClientMessage(Component.literal("Kingdoms can only be created in the Overworld!"), true);
