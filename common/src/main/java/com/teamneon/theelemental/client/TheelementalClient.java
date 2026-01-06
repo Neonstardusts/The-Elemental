@@ -1,21 +1,18 @@
 package com.teamneon.theelemental.client;
 
 
+import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
-import com.teamneon.theelemental.client.tooltip.RuneRecipeTooltipComponent;
+import com.teamneon.theelemental.item.property.ElementIdProperty;
+import com.teamneon.theelemental.item.property.SpellVariantProperty;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeScreen;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
 import net.blay09.mods.balm.client.platform.event.callback.RenderCallback;
 import net.blay09.mods.balm.client.platform.event.callback.ScreenCallback;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.world.inventory.Slot;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static com.teamneon.theelemental.Theelemental.id;
 
 
 public class TheelementalClient {
@@ -31,6 +28,20 @@ public class TheelementalClient {
             screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
         });
 
+        registrars.rangeSelectItemModelProperties(properties -> {
+            // "theelemental:element_id" matches the "property" key in your JSON
+            properties.register(
+                    id("element_id"),
+                    ElementIdProperty.MAP_CODEC
+            );
+
+            // "theelemental:spell_variant" matches the nested property in your JSON
+            properties.register(
+                    id("spell_variant"),
+                    SpellVariantProperty.MAP_CODEC
+            );
+        });
+
         RenderCallback.Gui.AFTER.register((guiGraphics, window) -> {
             Minecraft client = Minecraft.getInstance();
             if (client.player != null) {
@@ -42,7 +53,6 @@ public class TheelementalClient {
         });
 
 
-
-
     }
+
 }

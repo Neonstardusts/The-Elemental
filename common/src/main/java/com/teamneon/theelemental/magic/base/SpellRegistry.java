@@ -35,6 +35,15 @@ public class SpellRegistry {
                 )
         );
 
+        register(1002, json ->
+                new CinderSigilSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
+                )
+        );
+
         register(8001, json ->
                 new BlinkSpell(
                         intVal(json, "ManaCost"),

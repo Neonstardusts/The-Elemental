@@ -8,6 +8,7 @@ import net.neoforged.fml.common.Mod;
 import com.teamneon.theelemental.Theelemental;
 import com.teamneon.theelemental.client.TheelementalClient;
 
+
 @Mod(value = Theelemental.MOD_ID, dist = Dist.CLIENT)
 public class NeoForgeTheelementalClient {
 

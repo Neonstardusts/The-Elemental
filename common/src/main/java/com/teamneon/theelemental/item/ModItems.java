@@ -1,6 +1,7 @@
 package com.teamneon.theelemental.item;
 
 import com.teamneon.theelemental.magic.base.Spell;
+import net.blay09.mods.balm.tags.BalmItemTags;
 import net.blay09.mods.balm.world.item.BalmCreativeModeTabRegistrar;
 import net.blay09.mods.balm.world.item.BalmItemRegistrar;
 import net.blay09.mods.balm.world.item.DeferredItem;
@@ -25,7 +26,6 @@ public class ModItems {
         MAGIC_TEST_ITEM = items.register("magic_test_item", MagicTestItem::new).asDeferredItem();
         KINGDOM_CORE_ITEM = items.register("kingdom_starter", KingdomCoreItem::new).asDeferredItem();
     }
-
     public static void initialize(BalmCreativeModeTabRegistrar creativeModeTabs) {
         creativeModeTabs.register(Theelemental.MOD_ID, builder ->
                 builder.title(Component.translatable(id(Theelemental.MOD_ID).toLanguageKey("itemGroup")))

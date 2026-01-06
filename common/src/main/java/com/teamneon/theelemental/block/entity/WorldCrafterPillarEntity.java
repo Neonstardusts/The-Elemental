@@ -79,11 +79,8 @@ public class WorldCrafterPillarEntity extends BlockEntity {
                 ValueOutput slotTag = list.addChild();
                 slotTag.putInt("Slot", i);
 
-                // Get registry name as string
-                String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-                slotTag.putString("id", itemId);
-
-                slotTag.putInt("Count", stack.getCount());
+                // Use the ItemStack Codec to save EVERYTHING (ID, Count, and Components)
+                slotTag.store("Item", ItemStack.CODEC, stack);
             }
         }
     }
@@ -92,28 +89,16 @@ public class WorldCrafterPillarEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
 
-        // DEBUG: Check if we are on client or server
-
         this.inventory.clearContent();
         input.childrenList("Inventory").ifPresent(list -> {
             for (ValueInput slotTag : list) {
                 int slot = slotTag.getIntOr("Slot", 0);
-                int count = slotTag.getIntOr("Count", 1);
 
-                slotTag.getString("id").ifPresent(idString -> {
-                    // Use your custom id helper
-                    Identifier res = Identifier.parse(idString);
-                    BuiltInRegistries.ITEM.getOptional(res).ifPresent(holder -> {
-                        net.minecraft.world.item.Item item = holder.asItem();
-
-                        if (item != Items.AIR) {
-                            ItemStack stack = new ItemStack(item, count);
-                            if (slot >= 0 && slot < inventory.getContainerSize()) {
-                                inventory.setItem(slot, stack);
-
-                            }
-                        }
-                    });
+                // Read the entire stack using the Codec
+                slotTag.read("Item", ItemStack.CODEC).ifPresent(stack -> {
+                    if (slot >= 0 && slot < inventory.getContainerSize()) {
+                        inventory.setItem(slot, stack);
+                    }
                 });
             }
         });

@@ -8,6 +8,7 @@ import com.teamneon.theelemental.helpers.TempBlock;
 import com.teamneon.theelemental.magic.base.ActiveSpellManager;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
+import com.teamneon.theelemental.magic.world.WorldEffectManager;
 import com.teamneon.theelemental.store.SpellInfoServerHelper;
 import com.teamneon.theelemental.world.spawn.PillarGenerator;
 import net.blay09.mods.balm.Balm;
@@ -95,6 +96,7 @@ public class ElementalEvents {
         ServerTickCallback.ServerLevelTick.AFTER.register(level -> {
             TempBlock.tickAll();
             ActiveSpellManager.tickAll(level);
+            WorldEffectManager.tickAll(level);
         });
 
 

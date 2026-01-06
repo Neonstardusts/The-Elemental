@@ -1,0 +1,15 @@
+{
+  "item.theelemental.broken_prefix": "Broken",
+  "item.theelemental.fire_rune": "Rune of Fire",
+  "item.theelemental.light_scroll": "Scroll of Light",
+  "item.theelemental.sorcery_tome": "Sorcery Tome",
+  "item.theelemental.earth_tablet": "Earth Tablet",
+  "item.theelemental.storm_core": "Storm Core",
+  "item.theelemental.ocean_conch": "Ocean Conch",
+  "item.theelemental.dark_codex": "Codex of Shadows",
+  "item.theelemental.warped_shard": "Warped Shard",
+  "item.theelemental.wind_feather": "Wind Feather",
+  "item.theelemental.unknownspellrune": "Unknown Spell Rune",
+  "item.theelemental.rune_blank": "Elemental Amalgam",
+  "itemGroup.theelemental.theelemental": "The Elemental Mod"
+}

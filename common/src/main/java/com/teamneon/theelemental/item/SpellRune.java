@@ -27,6 +27,30 @@ public class SpellRune extends Item {
     }
 
     @Override
+    public Component getName(ItemStack stack) {
+        RuneData data = stack.get(ModComponents.rune.value());
+        if (data == null) {
+            return super.getName(stack);
+        }
+
+        return Component.translatable(
+                switch (data.elementId()) {
+                    case 1 -> "item.theelemental.fire_rune";        // Fire
+                    case 2 -> "item.theelemental.light_scroll";     // Light
+                    case 3 -> "item.theelemental.sorcery_tome";     // Sorcery
+                    case 4 -> "item.theelemental.earth_tablet";     // Earth
+                    case 5 -> "item.theelemental.storm_core";       // Storm
+                    case 6 -> "item.theelemental.ocean_conch";      // Ocean
+                    case 7 -> "item.theelemental.dark_codex";       // Dark
+                    case 8 -> "item.theelemental.warped_shard";     // Warped
+                    case 9 -> "item.theelemental.wind_feather";     // Wind
+                    default -> "item.theelemental.unknownspellrune";
+                }
+        );
+
+    }
+
+    @Override
     public void appendHoverText(
             ItemStack stack,
             TooltipContext context,
@@ -68,7 +92,7 @@ public class SpellRune extends Item {
         double durationSeconds = Math.round(runeData.durationTicks() / 20.0 * 10) / 10.0;
         if (runeData.durationTicks() > 0) {
             tooltipAdder.accept(Component.empty()
-                    .append(Component.literal("          ♒").withStyle(style -> style.withColor(0xb36fad)))
+                    .append(Component.literal("          ¤").withStyle(style -> style.withColor(0xb36fad)))
                     .append(Component.literal(" ᴅᴜʀᴀᴛɪᴏɴ →").withStyle(style -> style.withColor(0x8a8a8a)))
                     .append(Component.literal(" "+durationSeconds+"s").withStyle(style -> style.withColor(0xb36fad)))
 

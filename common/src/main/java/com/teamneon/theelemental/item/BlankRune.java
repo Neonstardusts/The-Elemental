@@ -23,7 +23,7 @@ public class BlankRune extends Item {
             Consumer<Component> tooltipAdder,
             TooltipFlag flag
     ) {
-        tooltipAdder.accept(Component.literal("A blank rune, use at a kingdom heart to research a recipe.").withStyle(ChatFormatting.DARK_GRAY));
+        tooltipAdder.accept(Component.literal("An elemental item ready to transform to any element, use at a kingdom heart to research a recipe.").withStyle(ChatFormatting.DARK_GRAY));
 
     }
 }

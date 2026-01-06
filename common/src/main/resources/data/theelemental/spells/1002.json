@@ -1,0 +1,15 @@
+{
+  "SpellName": "Cinder Sigil",
+  "ManaCost": 60,
+  "Cooldown": 400,
+  "Duration": 1000,
+  "Description": "Place a blazing sigil that ignites the air around it. Any creature entering the sigil is engulfed in an explosive burst of fire.",
+  "RecipeItems": {
+    "minecraft:blaze_powder": 3,
+    "minecraft:blaze_rod": 2,
+    "minecraft:amethyst_shard": 1,
+    "minecraft:fire_charge": 1,
+    "minecraft:coal": 1,
+    "minecraft:ghast_tear": 1
+  }
+}

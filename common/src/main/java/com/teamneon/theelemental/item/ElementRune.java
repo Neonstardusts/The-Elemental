@@ -27,6 +27,32 @@ public class ElementRune extends Item {
         super(properties.stacksTo(1));
     }
 
+    @Override
+    public Component getName(ItemStack stack) {
+        RuneData data = stack.get(ModComponents.rune.value());
+        if (data == null) {
+            return super.getName(stack);
+        }
+
+        return Component.translatable("item.theelemental.broken_prefix")
+                .append(" ")
+                .append(Component.translatable(
+                        switch (data.elementId()) {
+                            case 1 -> "item.theelemental.fire_rune";
+                            case 2 -> "item.theelemental.light_scroll";
+                            case 3 -> "item.theelemental.sorcery_tome";
+                            case 4 -> "item.theelemental.earth_tablet";
+                            case 5 -> "item.theelemental.storm_core";
+                            case 6 -> "item.theelemental.ocean_conch";
+                            case 7 -> "item.theelemental.dark_codex";
+                            case 8 -> "item.theelemental.warped_shard";
+                            case 9 -> "item.theelemental.wind_feather";
+                            default -> "item.theelemental.unknown";
+                        }
+                ))
+                .withStyle(ChatFormatting.GRAY);
+
+    }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {

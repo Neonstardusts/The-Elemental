@@ -15,6 +15,7 @@ import com.teamneon.theelemental.store.RuneData;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.world.BalmMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -28,9 +29,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -124,6 +127,16 @@ public class KingdomCoreInteraction {
 
                     // Create RuneData with spellName
                     RuneData runeData = new RuneData(elementId, spellId, spellName, recipeItems, manaCost, cooldown, description, durationTicks);
+                    // When the rune is updated:
+                    float combinedValue = (float) (elementId * 10) + (spellId % 4);
+
+                    // 2. Wrap it in a List of Floats
+                    List<Float> floatList = List.of(combinedValue);
+
+                    // 3. Create the component (passing empty lists for flags, colors, and strings)
+                    // The constructor usually looks like: (floats, flags, colors, strings)
+                    CustomModelData component = new CustomModelData(floatList, List.of(), List.of(), List.of());
+                    stack.set(DataComponents.CUSTOM_MODEL_DATA, component);
 
                     // Attach component to ItemStack
                     elementRune.set(ModComponents.rune.value(), runeData);
