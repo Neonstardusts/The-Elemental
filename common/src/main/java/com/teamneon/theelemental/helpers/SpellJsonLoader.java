@@ -37,10 +37,7 @@ public final class SpellJsonLoader {
         return recipeMap;
     }
 
-    /**
-     * Loads the full spell JSON as a Map<String, Object>.
-     * Use this to get SpellName, ManaCost, Cooldown, etc.
-     */
+
     public static Map<String, Object> getFullSpellJson(int spellId, ResourceManager manager) throws Exception {
         Identifier loc = id("spells/" + spellId + ".json");
         Resource resource = manager.getResource(loc)

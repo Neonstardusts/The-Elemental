@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "theelemental:block/world_crafter"
+    }
+  }
+}

@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,11 @@ import static com.teamneon.theelemental.helpers.KingdomAnchorHelper.RADIUS;
 
 public class WorldCrafter extends BaseEntityBlock {
 
-    public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
+    public static final VoxelShape SHAPE = Shapes.or(
+            Block.box(3, 0, 3, 13, 9, 13),
+            Block.box(1, 9, 1, 15, 16, 15)
+    );
+
     public static final MapCodec<WorldCrafter> CODEC = simpleCodec(WorldCrafter::new);
 
     public WorldCrafter(Properties properties) {

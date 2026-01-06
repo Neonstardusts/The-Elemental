@@ -22,7 +22,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldCrafterPillar extends BaseEntityBlock {
-    public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
+    public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 15, 14);
     public static final MapCodec<WorldCrafterPillar> CODEC = simpleCodec(WorldCrafterPillar::new);
 
     public WorldCrafterPillar(Properties properties) {
