@@ -2,6 +2,7 @@ package com.teamneon.theelemental;
 
 import com.teamneon.theelemental.block.entity.ModBlockEntities;
 import com.teamneon.theelemental.client.ModRenderers;
+import com.teamneon.theelemental.command.ModCommands;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.events.ElementalEvents;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
@@ -42,6 +43,7 @@ public class Theelemental {
         // ---- REGISTRIES ----
         registrars.dataComponentTypes(ModComponents::initialize);
 
+
         registrars.blocks(ModBlocks::initialize);
         registrars.items(ModItems::initialize);
         registrars.creativeModeTabs(ModItems::initialize);
@@ -54,6 +56,8 @@ public class Theelemental {
         // If registrars.networking exists, use it. Otherwise, use Balm.networking()
         ModNetworking.initialize(Balm.networking());
         logger.info("The Elemental is initializing!");
+
+        ModCommands.initialize();
 
     }
 

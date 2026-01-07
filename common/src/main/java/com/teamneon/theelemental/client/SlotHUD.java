@@ -1,5 +1,8 @@
 package com.teamneon.theelemental.client;
 
+import com.teamneon.theelemental.helpers.ElementRegistry;
+import com.teamneon.theelemental.magic.base.Spell;
+import com.teamneon.theelemental.magic.base.SpellRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -16,7 +19,13 @@ public class SlotHUD {
         if (mc.player == null) return;
 
         int currentSlot = ClientElementalData.getCurrentSlot();
+
         List<Integer> activeSlots = ClientElementalData.get().getActiveSlots();
+        int element = ClientElementalData.get().getElement();
+        int elementColor = ElementRegistry.getColor(ClientElementalData.get().getElement()); // 0xRRGGBB
+        float alphaF = 1f; // 0.0 - 1.0
+        int alpha = (int)(alphaF * 255.0f) & 0xFF;
+        int colorWithAlpha = (alpha << 24) | elementColor;
 
         // Validate
         if (currentSlot < 0 || currentSlot >= activeSlots.size()) return;
@@ -31,10 +40,34 @@ public class SlotHUD {
 
         String valueText = slotValue >= 0 ? Integer.toString(slotValue) : "error";
         Identifier slotTexture = id("textures/gui/spell_icons/" + valueText + ".png");
+        Identifier elementTexture = id("textures/gui/element_icons/element_" + element + ".png");
         Identifier overlayTexture = id("textures/gui/spell_frame.png");
+
+        ClientSpellInfo spellInfo = ClientSpellRegistry.getSpell(slotValue);
+        String SpellName;
+
+        if (spellInfo == null || spellInfo.name == null || spellInfo.name.isEmpty()) {
+            SpellName = "Blank";
+        } else {
+            SpellName = spellInfo.name;
+        }
+
+
+
 
         //Draw the spell icons
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, slotTexture, x, y, 0, 0, 32, 32, 32, 32);
+
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, elementTexture, x-4, y-20, 0, 0, 16, 16, 16, 16, colorWithAlpha);
+
+        // Current Slot
+        String indexText = Integer.toString(currentSlot + 1);
+        guiGraphics.drawString(mc.font, indexText, x+14, y-16, 0xFFFFFFFF, true);
+
+        // Spell Name
+        guiGraphics.drawString(mc.font, SpellName, x + 23, y-16, colorWithAlpha, true);
+
+
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, overlayTexture, x-4, y-4, 0, 0, 40, 40, 40, 40);
 
         // 2. DRAW COOLDOWN OVERLAY
@@ -54,13 +87,7 @@ public class SlotHUD {
             guiGraphics.drawString(mc.font, cdText, x + 16 - (textWidth / 2), y + 12, 0xFF555555, true);
         }
 
-        //DEBUG STUFF
-        // --- Draw small slot index (1–8) ---
-        String indexText = Integer.toString(currentSlot + 1);
-        guiGraphics.drawString(mc.font, indexText, x, y-10, 0xFFFFFFFF, true);
 
-        // --- Draw big ActiveSlot value next to it ---
-        guiGraphics.drawString(mc.font, valueText, x + 20, y-10, 0xFFFF00FF, true);
 
     }
 }

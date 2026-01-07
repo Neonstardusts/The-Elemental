@@ -1,5 +1,6 @@
 package com.teamneon.theelemental.magic.spells;
 
+import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.magic.base.Spell;
 import com.teamneon.theelemental.magic.base.SpellCastResult;
 import net.minecraft.core.BlockPos;
@@ -118,11 +119,9 @@ public class LuxSpell extends Spell {
             for (int i = 0; i <= steps; i++) {
                 double t = i / (double) steps;
                 Vec3 particlePos = start.add(direction.scale(start.distanceTo(hitPos) * t));
-                server.sendParticles(
-                        ParticleTypes.END_ROD,
-                        particlePos.x, particlePos.y, particlePos.z,
-                        1, 0, 0, 0, 0
-                );
+                UtilityHelper.spawnDust(server, particlePos.x, particlePos.y, particlePos.z, 0xebd234, 1, 0, 0, 0, 0, 1f);
+
+
             }
 
             // Spawn impact particles at the hit position

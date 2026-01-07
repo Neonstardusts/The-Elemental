@@ -12,4 +12,5 @@ public class ClientSpellRegistry {
     public static ClientSpellInfo getSpell(int spellId) {
         return SPELLS.get(spellId);
     }
+
 }
