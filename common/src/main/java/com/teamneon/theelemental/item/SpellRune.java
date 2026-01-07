@@ -102,7 +102,19 @@ public class SpellRune extends Item {
         tooltipAdder.accept(Component.empty());
 
         tooltipAdder.accept(Component.literal("ᴅᴇꜱᴄʀɪᴘᴛɪᴏɴ: ").withStyle(style -> style.withColor(0x8a8a8a)));
-        tooltipAdder.accept(Component.literal(runeData.description()).withStyle(ChatFormatting.DARK_GRAY));
+        String description = runeData.description();
+
+        // Split on ". " to get each sentence
+        String[] parts = description.split("\\. ");
+
+        for (String part : parts) {
+            // Add the period back if it was removed by split
+            if (!part.endsWith(".")) part += ".";
+
+            tooltipAdder.accept(Component.literal(part).withStyle(ChatFormatting.DARK_GRAY));
+        }
+
+
 
     }
 

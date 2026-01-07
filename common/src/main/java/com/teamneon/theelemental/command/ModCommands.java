@@ -12,6 +12,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.server.permissions.PermissionSet;
 
 public class ModCommands {
 
@@ -19,6 +22,7 @@ public class ModCommands {
         Balm.commands().register(dispatcher -> {
             dispatcher.register(
                     Commands.literal("setspell")
+                            .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(4))))
                             .then(Commands.argument("slot", IntegerArgumentType.integer(0, 4))
                                     .then(Commands.argument("spell", IntegerArgumentType.integer(0))
                                             .executes(ctx -> {

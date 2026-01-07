@@ -42,7 +42,7 @@ public class KingdomCoreBlockEntity extends BlockEntity implements BeaconBeamOwn
     private final Set<UUID> members = new HashSet<>();
     private int element;
     private int tickCounter = 0;
-    private float radius = 64.0f;
+    private float radius = 32.0f;
 
     public KingdomCoreBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.KINGDOM_CORE_REG.asSupplier().get(), pos, state);
@@ -61,7 +61,11 @@ public class KingdomCoreBlockEntity extends BlockEntity implements BeaconBeamOwn
     public void setRadius(float radius) {
         this.radius = radius;
         setChanged();
-        sync(); // optional, if you want clients to know immediately
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 6);
+        }
+
+        sync();
     }
 
     private void serverTick() {
@@ -198,6 +202,7 @@ public class KingdomCoreBlockEntity extends BlockEntity implements BeaconBeamOwn
             output.putString("Owner", owner.toString());
         }
         output.putInt("Element", element);
+        output.putFloat("Radius", radius);
 
         ValueOutputList list = output.childrenList("Members");
         for (UUID id : members) {
@@ -208,6 +213,7 @@ public class KingdomCoreBlockEntity extends BlockEntity implements BeaconBeamOwn
     public void loadAdditional(ValueInput input) {
         input.getString("Owner").ifPresent(s -> owner = UUID.fromString(s));
         element = input.getIntOr("Element", 0);
+        radius = input.getFloatOr("Radius", 32.0f);
 
         input.childrenList("Members").ifPresent(list -> {
             members.clear();
@@ -216,6 +222,7 @@ public class KingdomCoreBlockEntity extends BlockEntity implements BeaconBeamOwn
             }
         });
     }
+
 
     /* ---------------- Sync ---------------- */
 

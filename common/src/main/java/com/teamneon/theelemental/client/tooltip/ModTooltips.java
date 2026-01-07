@@ -17,5 +17,10 @@ public class ModTooltips {
                 SpellIconTooltipComponent::new       // factory to client render component
         );
 
+        registrar.register(
+                InfoTooltipComponentData.class, // server/common TooltipComponent
+                InfoTooltipComponent::new       // factory to client render component
+        );
+
     }
 }

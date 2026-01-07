@@ -2,6 +2,7 @@ package com.teamneon.theelemental.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.teamneon.theelemental.block.KingdomCoreBlock;
 import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
 import com.teamneon.theelemental.helpers.ElementRegistry;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -11,7 +12,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
@@ -30,12 +33,34 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
     @Override
     public void extractRenderState(KingdomCoreBlockEntity be, KingdomCoreRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
         BlockEntityRenderState.extractBase(be, state, crumbling);
+        int element = 0;
+        if (be.getLevel() != null) {
+            BlockState blockState = be.getLevel().getBlockState(be.getBlockPos());
+            element = blockState.getValue(KingdomCoreBlock.ELEMENTCore);
+        }
 
         state.animationTime = be.getLevel() != null ? (float) Math.floorMod(be.getLevel().getGameTime(), 40) + partialTick : 0.0F;
-        state.color = 0xFF000000 | ElementRegistry.getColor(be.getElement());
+        state.color = 0xFF000000 | ElementRegistry.getColor(element);
         state.worldPosition = be.getBlockPos();
         state.level = be.getLevel();
         state.radius = be.getRadius(); // ✅ copy radius from BE
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen() {
+        // Always render the core and its ring regardless of view frustum
+        return true;
+    }
+
+
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    @Override
+    public boolean shouldRender(KingdomCoreBlockEntity be, Vec3 cameraPos) {
+        return true;
     }
 
 
@@ -55,16 +80,24 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
                 0.4F                      // outer radius
         );
 
+        // 2️⃣ Get the radius directly from the BE
+        float radius = state.level.getBlockEntity(state.worldPosition) instanceof KingdomCoreBlockEntity be
+                ? be.getRadius()
+                : state.radius;
+
+        final float dynamicRadius = radius;
+
+
         // 2️⃣ Draw forcefield ring at player Y level
         collector.submitCustomGeometry(
                 poseStack,
                 net.minecraft.client.renderer.rendertype.RenderTypes.lines(),
-                (pose, consumer) -> renderForcefieldRing(state, pose, consumer, cameraState)
+                (pose, consumer) -> renderForcefieldRing(state, pose, consumer, cameraState, dynamicRadius)
         );
     }
 
-    private static void renderForcefieldRing(KingdomCoreRenderState state, PoseStack.Pose pose, VertexConsumer consumer, CameraRenderState cameraState) {
-        int segments = (int) state.radius + 8; // increase for smoother rings if needed
+    private static void renderForcefieldRing(KingdomCoreRenderState state, PoseStack.Pose pose, VertexConsumer consumer, CameraRenderState cameraState, float radius) {
+        int segments = (int) radius + 8; // increase for smoother rings if needed
 
         float a = ((state.color >> 24) & 0xFF) / 255f;
         float r = ((state.color >> 16) & 0xFF) / 255f;
@@ -73,7 +106,6 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
 
         a *= 0.6F + 0.4F * Mth.sin(state.animationTime * 0.15F);
 
-        float radius = state.radius; // radius from the block entity
 
         // Track first and previous vertex
         float firstX = 0, firstY = 0, firstZ = 0;
@@ -152,13 +184,5 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
 
 
 
-    @Override
-    public boolean shouldRenderOffScreen() {
-        return true;
-    }
 
-    @Override
-    public int getViewDistance() {
-        return 256;
-    }
 }

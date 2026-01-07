@@ -2,17 +2,18 @@ package com.teamneon.theelemental.client.tooltip;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.contents.objects.ObjectInfo;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
-public record RuneRecipeTooltipComponentData(List<ItemStack> recipeItems) implements TooltipComponent, ObjectInfo {
+public record RuneRecipeTooltipComponentData(List<ItemStack> recipeItems, List<Component> ritualText) implements TooltipComponent, ObjectInfo {
 
     public static final MapCodec<RuneRecipeTooltipComponentData> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ItemStack.CODEC.listOf().fieldOf("items").forGetter(RuneRecipeTooltipComponentData::recipeItems)
-    ).apply(inst, RuneRecipeTooltipComponentData::new));
+    ).apply(inst, data -> new RuneRecipeTooltipComponentData(data, List.of())));
 
     @Override
     public MapCodec<? extends ObjectInfo> codec() { return CODEC; }

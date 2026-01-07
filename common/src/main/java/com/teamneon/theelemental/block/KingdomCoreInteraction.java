@@ -78,7 +78,18 @@ public class KingdomCoreInteraction {
 
             player.displayClientMessage(Component.literal("Your mana increased by 10!"), true);
             return InteractionResult.CONSUME;
-        } else if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
+        } else if (stack.getItem() == Items.DIAMOND) {
+            // Increase the Kingdom Core radius by 1, max 128
+            float newRadius = Math.min(core.getRadius() + 1.0f, 128.0f);
+            core.setRadius(newRadius);
+
+            // Consume the diamond
+            stack.shrink(1);
+
+            player.displayClientMessage(Component.literal("The Kingdom Core radius increased to " + (int)newRadius) , true);
+            return InteractionResult.CONSUME;
+        }
+        else if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
             // Get player's elemental data
             ElementalData data = ElementalDataHandler.get(player);
 
