@@ -1,0 +1,9 @@
+{
+  "SpellName": "Leap",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "Description": "Launch yourself forward",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

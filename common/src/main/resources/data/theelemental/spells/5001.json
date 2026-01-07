@@ -1,0 +1,9 @@
+{
+  "SpellName": "Chain Lightning",
+  "ManaCost": 50,
+  "Cooldown": 60,
+  "Description": "shoot chain lightning.",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "SpellName": "Wither Skull",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "Description": "Shoot a wither skull",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

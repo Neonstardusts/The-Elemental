@@ -1,0 +1,10 @@
+{
+  "SpellName": "Spectral Shot",
+  "ManaCost": 50,
+  "Cooldown": 60,
+  "Duration": 60,
+  "Description": "Shoot a volley of arrows",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

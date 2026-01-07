@@ -35,14 +35,6 @@ public class SpellRegistry {
                 )
         );
 
-        register(2001, json ->
-                new LuxSpell(
-                        intVal(json, "ManaCost"),
-                        intVal(json, "Cooldown"),
-                        strVal(json, "SpellName")
-                )
-        );
-
         register(1002, json ->
                 new CinderSigilSpell(
                         intVal(json, "ManaCost"),
@@ -52,11 +44,20 @@ public class SpellRegistry {
                 )
         );
 
-        register(8001, json ->
-                new BlinkSpell(
+        register(2001, json ->
+                new LuxSpell(
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
                         strVal(json, "SpellName")
+                )
+        );
+
+        register(3001, json ->
+                new SpectralShotSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
                 )
         );
 
@@ -69,6 +70,14 @@ public class SpellRegistry {
                 )
         );
 
+        register(5001, json ->
+                new ChainLightningSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
         register(6001, json ->
                 new TorrentSpell(
                         intVal(json, "ManaCost"),
@@ -77,6 +86,34 @@ public class SpellRegistry {
                         intVal(json, "Duration")
                 )
         );
+
+        register(7001, json ->
+                new WitherSkullSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
+
+
+        register(8001, json ->
+                new BlinkSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
+        register(9001, json ->
+                new LeapSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
+
     }
 
     public static void register(int id, SpellFactory factory) {
