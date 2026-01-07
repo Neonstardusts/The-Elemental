@@ -1,0 +1,11 @@
+{
+  "SpellName": "Lux",
+  "ManaCost": 10,
+  "Cooldown": 20,
+  "Description": "Cast a beam, damaging mobs, or solidifying as light",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 3,
+    "minecraft:gold_ingot": 3,
+    "minecraft:glowstone_dust": 3
+  }
+}

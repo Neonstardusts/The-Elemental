@@ -4,13 +4,10 @@
   "Cooldown": 40,
   "Description": "A fiery ball that burns enemies",
   "RecipeItems": {
-    "minecraft:blaze_powder": 3,
     "minecraft:blaze_rod": 1,
     "minecraft:amethyst_shard": 1,
     "minecraft:coal": 2,
     "minecraft:fire_charge": 2,
-    "minecraft:magma_block": 1,
-    "minecraft:nether_wart": 1,
-    "minecraft:redstone": 1
+    "minecraft:magma_block": 3
   }
 }

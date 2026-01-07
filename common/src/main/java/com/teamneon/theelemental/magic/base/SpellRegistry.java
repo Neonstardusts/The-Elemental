@@ -35,6 +35,14 @@ public class SpellRegistry {
                 )
         );
 
+        register(2001, json ->
+                new LuxSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
         register(1002, json ->
                 new CinderSigilSpell(
                         intVal(json, "ManaCost"),
