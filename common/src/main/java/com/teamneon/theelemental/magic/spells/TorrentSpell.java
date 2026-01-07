@@ -13,11 +13,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class TorrentSpell extends DurationSpell {
 
-    private static final int ORBIT_RADIUS = 3;
-    private static final int ORBIT_POINTS = 16;
-    private static final long WATER_DURATION_TICKS = 1; // how long each water block lasts
-
-    private float angle = 0f;
 
     public TorrentSpell(int manaCost, int cooldownTicks,  String name, long durationTicks) {
         super(manaCost, cooldownTicks, name, durationTicks);
@@ -25,25 +20,7 @@ public class TorrentSpell extends DurationSpell {
 
     @Override
     public void tick(Level level, Player player) {
-        // Debug tick
-        System.out.println("[DEBUG] TorrentSpell tick for player: " + player.getName().getString());
-
-        // Player position slightly above ground
-        var playerPos = player.position().add(0, 1, 0);
-
-        for (int i = 0; i < ORBIT_POINTS; i++) {
-            double theta = angle + 2 * Math.PI * i / ORBIT_POINTS;
-            double x = playerPos.x + ORBIT_RADIUS * Math.cos(theta);
-            double z = playerPos.z + ORBIT_RADIUS * Math.sin(theta);
-            BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(playerPos.y), (int) Math.floor(z));
-
-            // Only place water if air
-            if (level.getBlockState(pos).isAir() && !TempBlock.isTempBlock(level, pos.below())) {
-                TempBlock.placeAlmostFullWater(level, pos, WATER_DURATION_TICKS);
-            }
-        }
-
-        angle += 0.1; // rotate orbit slightly each tick
+        // this is called after the spell si exectueed every tick for its duraiton so logic here
     }
 
     @Override

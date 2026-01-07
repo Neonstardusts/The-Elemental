@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import static com.teamneon.theelemental.Theelemental.id;
 import static com.teamneon.theelemental.block.KingdomAnchor.ELEMENT;
-
+import static com.teamneon.theelemental.block.KingdomCoreBlock.ELEMENTCore;
 
 
 public class TheelementalClient {

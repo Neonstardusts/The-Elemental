@@ -1,6 +1,8 @@
 package com.teamneon.theelemental.block;
 
+import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
+import com.teamneon.theelemental.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -8,15 +10,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class KingdomCoreBlock extends Block implements EntityBlock {
+public class KingdomCoreBlock extends BaseEntityBlock implements EntityBlock {
 
     public static final IntegerProperty ELEMENTCore =
             IntegerProperty.create("elementcore", 0, 9);
@@ -26,6 +32,15 @@ public class KingdomCoreBlock extends Block implements EntityBlock {
         this.registerDefaultState(
                 this.stateDefinition.any().setValue(ELEMENTCore, 0)
         );
+    }
+
+    public static final MapCodec<KingdomCoreBlock> CODEC =
+            simpleCodec(KingdomCoreBlock::new);
+
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -53,9 +68,6 @@ public class KingdomCoreBlock extends Block implements EntityBlock {
     }
 
 
-
-
-
     @Override
     public void setPlacedBy(
             Level level,
@@ -70,4 +82,21 @@ public class KingdomCoreBlock extends Block implements EntityBlock {
             core.setOwner(placer.getUUID());
         }
     }
+
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level,
+            BlockState state,
+            BlockEntityType<T> type
+    ) {
+        return level.isClientSide() ? null :
+                createTickerHelper(
+                        type,
+                        ModBlockEntities.KINGDOM_CORE_REG.asSupplier().get(),
+                        KingdomCoreBlockEntity::tick
+                );
+    }
+
+
 }

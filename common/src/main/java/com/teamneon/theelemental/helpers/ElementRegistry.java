@@ -15,15 +15,15 @@ public final class ElementRegistry {
 
     static {
         // Register elements with a color (0xRRGGBB)
-        register(Items.FIRE_CHARGE, 1, "Fire", "Fae", "The flames awaken in you!", 0xFF4500);       // Orange-red
-        register(Items.GLOW_BERRIES, 2, "Light", "Wisp", "A gentle glow surrounds you!", 0xFFFF00); // Yellow
-        register(Items.EMERALD, 3, "Sorcery", "Sprite", "The arcane flows through your veins!", 0x00FFCC); // Teal
-        register(Items.SPORE_BLOSSOM, 4, "Earth", "Ent", "The earth embraces your spirit!", 0x228B22); // Forest green
-        register(Items.GUNPOWDER, 5, "Storm", "Mote", "Lightning dances in your hands!", 0x1E90FF);  // Dodger blue
-        register(Items.NAUTILUS_SHELL, 6, "Ocean", "Siren", "The waves answer to your call!", 0x4682B4); // Steel blue
-        register(Items.ECHO_SHARD, 7, "Dark", "Spectre", "Shadows whisper your name!", 0x4B0082);     // Indigo
-        register(Items.ENDER_PEARL, 8, "Warped", "Sentinel", "The warped energies empower you!", 0x8A2BE2); // Blue violet
-        register(Items.WIND_CHARGE, 9, "Wind", "Zephyr", "The wind guides your path!", 0x87CEEB); // Sky blue
+        register(Items.FIRE_CHARGE, 1, "Fire", "Fae", "The flames awaken in you!", 0xf04b22);       // Orange-red
+        register(Items.GLOW_BERRIES, 2, "Light", "Wisp", "A gentle glow surrounds you!", 0xfabe28); // Yellow
+        register(Items.EMERALD, 3, "Sorcery", "Sprite", "The arcane flows through your veins!", 0xb4fa28); // lime
+        register(Items.SPORE_BLOSSOM, 4, "Earth", "Ent", "The earth embraces your spirit!", 0x40bf3b); // Forest green
+        register(Items.GUNPOWDER, 5, "Storm", "Mote", "Lightning dances in your hands!", 0x62e3d0);  // teal
+        register(Items.NAUTILUS_SHELL, 6, "Ocean", "Siren", "The waves answer to your call!", 0x1c87eb); // azure blue
+        register(Items.ECHO_SHARD, 7, "Dark", "Spectre", "Shadows whisper your name!", 0x5046c2);     // Indigo
+        register(Items.ENDER_PEARL, 8, "Warped", "Sentinel", "The warped energies empower you!", 0x8e3bed); // purple
+        register(Items.WIND_CHARGE, 9, "Wind", "Zephyr", "The wind guides your path!", 0xf285f2); // pink
     }
 
     private static void register(Item item, int id, String name, String race, String message, int color) {

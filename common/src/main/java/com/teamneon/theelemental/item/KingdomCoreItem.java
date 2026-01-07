@@ -105,7 +105,7 @@ public class KingdomCoreItem extends Item {
                 corePos,
                 ModBlocks.KINGDOM_CORE
                         .defaultBlockState()
-                        .setValue(KingdomCoreBlock.ELEMENT, playerElement),
+                        .setValue(KingdomCoreBlock.ELEMENTCore, playerElement),
                 3
         );
         globalData.registerCore(playerElement, corePos);

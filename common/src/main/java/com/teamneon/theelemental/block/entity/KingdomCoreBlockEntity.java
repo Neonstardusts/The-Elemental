@@ -1,6 +1,7 @@
 package com.teamneon.theelemental.block.entity;
 
 import com.teamneon.theelemental.block.ModBlocks;
+import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.helpers.ElementRegistry;
 import com.teamneon.theelemental.helpers.KingdomAnchorHelper;
 import com.teamneon.theelemental.kingdoms.KingdomSavedData;
@@ -9,6 +10,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,6 +21,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueOutput.ValueOutputList;
 import net.minecraft.world.level.storage.ValueInput.ValueInputList;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -27,10 +33,48 @@ public class KingdomCoreBlockEntity extends BlockEntity {
     private UUID owner;
     private final Set<UUID> members = new HashSet<>();
     private int element;
+    private int tickCounter = 0;
 
     public KingdomCoreBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.KINGDOM_CORE_REG.asSupplier().get(), pos, state);
     }
+
+    public static void tick(Level level, BlockPos pos, BlockState state, KingdomCoreBlockEntity be) {
+        if (level.isClientSide()) return;
+
+        be.serverTick();
+    }
+
+    private void serverTick() {
+        if (level == null || level.isClientSide()) return;
+
+        if (++tickCounter % 80 != 0) return; // every 4 seconds
+
+        int range = 40; // beacon radius
+        AABB box = new AABB(worldPosition).inflate(range);
+
+        for (Player player : level.getEntitiesOfClass(Player.class, box)) {
+
+            if (player.isSpectator() || !player.isAlive()) continue;
+
+            int playerElement = ElementalDataHandler.get(player).getElement(); // <- your element check
+
+            if (playerElement != this.element) continue; // only match element
+
+            // Apply effect
+            player.addEffect(new MobEffectInstance(
+                    MobEffects.SPEED, // example effect
+                    100,                        // duration (longer than tick interval)
+                    0,                          // amplifier
+                    true,                       // ambient
+                    true                        // show particles
+            ));
+        }
+    }
+
+
+
+
 
     /* ---------------- API ---------------- */
     public void delete() {

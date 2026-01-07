@@ -89,7 +89,7 @@ public class KingdomAnchor extends Block {
                     teleportToNearestSafeSpot(player, altarPos.getX(), altarPos.getY(), altarPos.getZ(), ElementRegistry.getColor(ToElement));
                 } else {
                     // Fallback if altar not yet registered
-                    player.displayClientMessage(Component.literal("No Location found."), true);
+                    player.displayClientMessage(Component.literal("The " + ElementRegistry.getName(ToElement) + " kingdom core, does not yet exist."), true);
                 }
 
                 // Reset click tracker
