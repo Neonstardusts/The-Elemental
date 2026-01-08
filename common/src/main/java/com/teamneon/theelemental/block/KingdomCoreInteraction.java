@@ -19,6 +19,7 @@ import com.teamneon.theelemental.store.SpellInfoServerHelper;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.world.BalmMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -37,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,193 +49,195 @@ import static com.teamneon.theelemental.helpers.UtilityHelper.teleportToNearestS
 
 public class KingdomCoreInteraction {
 
-    // Track shift-right-clicks per player
-    private static final Map<UUID, ClickTracker> shiftClickTracker = new HashMap<>();
-
-    private static class ClickTracker {
-        long lastClickTime;
-        int clickCount;
-    }
-
     /**
      * Handles all right-clicks (with item or empty hand)
      */
-    public static InteractionResult handleWithItem(Level world, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
+    public static InteractionResult handleWithItem(
+            Level world,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack stack,
+            BlockHitResult hitResult
+    ) {
         if (!(world.getBlockEntity(pos) instanceof KingdomCoreBlockEntity core)) {
             return InteractionResult.PASS;
         }
 
         if (world.isClientSide()) return InteractionResult.SUCCESS;
 
-        // --- Check if the item is amethyst ---
+        Direction face = hitResult.getDirection();
+
+        // Ignore top & bottom
+        if (face == Direction.UP || face == Direction.DOWN) {
+            return InteractionResult.PASS;
+        }
+
+        return switch (face) {
+            case NORTH -> handleTeleport(world, player, core);
+            case EAST -> openSoulForge(world, player, core);
+            case SOUTH -> handleManaRefill(world, player, stack, core);
+            case WEST -> openRuneCutter(world, player, core);
+            default -> InteractionResult.PASS;
+        };
+    }
+
+    private static InteractionResult handleTeleport(Level world, Player player, KingdomCoreBlockEntity core) {
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
+
+        KingdomSavedData globalData = KingdomSavedData.get((ServerLevel) world);
+        BlockPos altarPos = globalData.getCorePos(-1);
+
+        if (altarPos != null) {
+            teleportToNearestSafeSpot(
+                    player,
+                    altarPos.getX(),
+                    altarPos.getY(),
+                    altarPos.getZ(),
+                    ElementRegistry.getColor(core.getElement())
+            );
+        } else {
+            player.displayClientMessage(Component.literal("No Elemental Altar found."), true);
+        }
+
+        return InteractionResult.CONSUME;
+
+    }
+
+    private static InteractionResult openSoulForge(Level world, Player player, KingdomCoreBlockEntity core) {
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
+
+        if (player.getUUID().equals(core.getOwner()) || core.getMembers().contains(player.getUUID())) {
+            player.displayClientMessage(Component.literal("You opened the Kingdom Core!"), true);
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                MenuProvider soulForgeProvider = new BalmMenuProvider<ModMenuTypes.SoulForgeData>() {
+                    @Override
+                    public Component getDisplayName() {
+                        return Component.translatable("container.theelemental.soul_forge");
+                    }
+
+                    @Override
+                    public AbstractContainerMenu createMenu(int id, Inventory inv, Player p) {
+                        return new SoulForgeMenu(id, inv, p);
+                    }
+
+                    @Override
+                    public ModMenuTypes.SoulForgeData getScreenOpeningData(ServerPlayer player) {
+                        return new ModMenuTypes.SoulForgeData();
+                    }
+
+                    @Override
+                    public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.SoulForgeData> getScreenStreamCodec() {
+                        return ModMenuTypes.SoulForgeData.STREAM_CODEC;
+                    }
+                };
+
+                Balm.networking().openMenu(serverPlayer, soulForgeProvider);
+            }
+        } else {
+            player.displayClientMessage(Component.literal("You are not in this kingdom!"), true);
+        }
+
+        return InteractionResult.CONSUME;
+    }
+
+    private static InteractionResult handleManaRefill(
+            Level world,
+            Player player,
+            ItemStack stack,
+            KingdomCoreBlockEntity core
+    ) {
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
+
         if (stack.getItem() == Items.AMETHYST_SHARD) {
-            // Get player's elemental data
             ElementalData data = ElementalDataHandler.get(player);
 
-            // Element check
             if (data.getElement() != core.getElement()) {
-                player.displayClientMessage(Component.literal("Your element does not match this Kingdom Core!"), true);
+                player.displayClientMessage(
+                        Component.literal("Your element does not match this Kingdom Core!"),
+                        true
+                );
                 return InteractionResult.FAIL;
             }
 
-            // Increase mana
             data.setCurrentMana(data.getCurrentMana() + 10f);
-
-            // Consume 1 amethyst
             stack.shrink(1);
 
             player.displayClientMessage(Component.literal("Your mana increased by 10!"), true);
             return InteractionResult.CONSUME;
-        } else if (stack.getItem() == Items.DIAMOND) {
-            // Increase the Kingdom Core radius by 1, max 128
+        }
+
+        if (stack.getItem() == Items.DIAMOND) {
             float newRadius = Math.min(core.getRadius() + 1.0f, 128.0f);
             core.setRadius(newRadius);
-
-            // Consume the diamond
             stack.shrink(1);
 
-            player.displayClientMessage(Component.literal("The Kingdom Core radius increased to " + (int)newRadius) , true);
+            player.displayClientMessage(
+                    Component.literal("The Kingdom Core radius increased to " + (int) newRadius),
+                    true
+            );
             return InteractionResult.CONSUME;
         }
-        // Right-clicking with a Blank Rune
-        if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
-            if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer) {
 
-                // --- 4️⃣ Send SpellInfo metadata to client ---
-                ResourceManager manager = serverPlayer.level().getServer().getResourceManager();
+        return InteractionResult.CONSUME;
+    }
 
-                // Loop through all spells in your registry
-                for (int spellId : SpellRegistry.getAllSpellIds()) {
-                    // Skip ID 0 (empty spell)
-                    if (spellId <= 0) continue;
+    private static InteractionResult openRuneCutter(Level world, Player player, KingdomCoreBlockEntity core) {
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
 
-                    // Load the spell JSON and extract metadata
-                    ClientSpellInfo info = SpellInfoServerHelper.loadSpellInfo(spellId, manager);
+        if (player instanceof ServerPlayer serverPlayer) {
+            ResourceManager manager = serverPlayer.level().getServer().getResourceManager();
 
-// Send each field individually
-                    Balm.networking().sendTo(player, new SyncSpellInfoPacket(
-                            info.spellId,
-                            info.name,
-                            info.description,
-                            info.manaCost,
-                            info.cooldownTicks,
-                            info.durationTicks,
-                            info.requiredLevel
-                    ));
+            for (int spellId : SpellRegistry.getAllSpellIds()) {
+                if (spellId <= 0) continue;
 
-                }
+                ClientSpellInfo info = SpellInfoServerHelper.loadSpellInfo(spellId, manager);
 
-                // Create the menu provider
-                BalmMenuProvider<ModMenuTypes.RuneCutterData> runeCutterProvider = new BalmMenuProvider<>() {
-                    @Override
-                    public Component getDisplayName() {
-                        return Component.translatable("container.theelemental.rune_cutter");
-                    }
-
-                    @Override
-                    public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player p) {
-                        // Pass element = 0 or read from Kingdom Core / context if needed
-                        return new ElementalRuneCutterMenu(windowId, inv, ContainerLevelAccess.NULL, core.getElement());
-                    }
-
-                    @Override
-                    public ModMenuTypes.RuneCutterData getScreenOpeningData(ServerPlayer player) {
-                        return new ModMenuTypes.RuneCutterData(core.getElement());
-                    }
-
-                    @Override
-                    public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.RuneCutterData> getScreenStreamCodec() {
-                        return ModMenuTypes.RuneCutterData.STREAM_CODEC;
-                    }
-                };
-
-                // Open the menu for the server player
-                Balm.networking().openMenu(serverPlayer, runeCutterProvider);
+                Balm.networking().sendTo(player, new SyncSpellInfoPacket(
+                        info.spellId,
+                        info.name,
+                        info.description,
+                        info.manaCost,
+                        info.cooldownTicks,
+                        info.durationTicks,
+                        info.requiredLevel
+                ));
             }
 
-            return InteractionResult.SUCCESS; // client side will just return SUCCESS
-        }
+            BalmMenuProvider<ModMenuTypes.RuneCutterData> runeCutterProvider =
+                    new BalmMenuProvider<>() {
 
-        else {
-            // --- Empty-hand or any other item logic ---
-
-            // Only trigger teleport if player is sneaking
-            if (player.isShiftKeyDown()) {
-                UUID playerId = player.getUUID();
-                long currentTime = world.getGameTime();
-
-                ClickTracker tracker = shiftClickTracker.getOrDefault(playerId, new ClickTracker());
-
-                // Reset click count if more than 20 ticks (~1 sec) since last
-                if (currentTime - tracker.lastClickTime > 20) tracker.clickCount = 0;
-
-                tracker.clickCount++;
-                tracker.lastClickTime = currentTime;
-
-                shiftClickTracker.put(playerId, tracker);
-
-                if (tracker.clickCount >= 2) {
-                    // Get global data
-                    KingdomSavedData globalData = KingdomSavedData.get((ServerLevel) world);
-                    BlockPos altarPos = globalData.getCorePos(-1); // -1 = elemental altar
-
-                    if (altarPos != null) {
-                        // Teleport player to the altar
-                        teleportToNearestSafeSpot(player, altarPos.getX(), altarPos.getY(), altarPos.getZ(), ElementRegistry.getColor(core.getElement()));
-                    } else {
-                        // Fallback if altar not yet registered
-                        player.displayClientMessage(Component.literal("No Elemental Altar found."), true);
-                    }
-
-                    // Reset click tracker
-                    tracker.clickCount = 0;
-                    shiftClickTracker.put(playerId, tracker);
-
-                    return InteractionResult.CONSUME;
-                }
-
-                // Optional feedback for first click
-                player.displayClientMessage(Component.literal("Shift-right-click again to teleport..."), true);
-                return InteractionResult.CONSUME;
-            }
-
-            // Normal empty-hand interaction if member
-            if (player.getUUID().equals(core.getOwner()) || core.getMembers().contains(player.getUUID())) {
-                player.displayClientMessage(Component.literal("You opened the Kingdom Core!"), true);
-                if (!player.level().isClientSide()) {
-                    // Open the Menu using the Balm registration you created
-                    MenuProvider soulForgeProvider = new BalmMenuProvider<ModMenuTypes.SoulForgeData>() {
                         @Override
                         public Component getDisplayName() {
-                            return Component.translatable("container.theelemental.soul_forge");
+                            return Component.translatable("container.theelemental.rune_cutter");
                         }
 
                         @Override
-                        public AbstractContainerMenu createMenu(int id, Inventory inv, Player p) {
-                            return new SoulForgeMenu(id, inv, p);
+                        public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player p) {
+                            return new ElementalRuneCutterMenu(
+                                    windowId,
+                                    inv,
+                                    ContainerLevelAccess.NULL,
+                                    core.getElement()
+                            );
                         }
 
                         @Override
-                        public ModMenuTypes.SoulForgeData getScreenOpeningData(ServerPlayer player) {
-                            // This is where you provide the data the client needs
-                            return new ModMenuTypes.SoulForgeData();
+                        public ModMenuTypes.RuneCutterData getScreenOpeningData(ServerPlayer player) {
+                            return new ModMenuTypes.RuneCutterData(core.getElement());
                         }
 
                         @Override
-                        public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.SoulForgeData> getScreenStreamCodec() {
-                            // Tell Balm how to encode the data above
-                            return ModMenuTypes.SoulForgeData.STREAM_CODEC;
+                        public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.RuneCutterData>
+                        getScreenStreamCodec() {
+                            return ModMenuTypes.RuneCutterData.STREAM_CODEC;
                         }
                     };
-                    Balm.networking().openMenu(player, soulForgeProvider);
-                }
 
-
-            } else {
-                player.displayClientMessage(Component.literal("You are not in this kingdom!"), true);
-            }
-
-            return InteractionResult.CONSUME;
+            Balm.networking().openMenu(serverPlayer, runeCutterProvider);
         }
+
+        return InteractionResult.CONSUME;
     }
 }

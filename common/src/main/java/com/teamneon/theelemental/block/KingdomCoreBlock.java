@@ -55,7 +55,7 @@ public class KingdomCoreBlock extends BaseEntityBlock implements EntityBlock {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return KingdomCoreInteraction.handleWithItem(world, pos, player, hand, stack);
+        return KingdomCoreInteraction.handleWithItem(world, pos, player, hand, stack, hitResult);
     }
 
     @Override

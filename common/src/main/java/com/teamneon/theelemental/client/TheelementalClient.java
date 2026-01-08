@@ -80,6 +80,7 @@ public class TheelementalClient {
                 if (ClientElementalData.get().getElement() > 0) {
                     SlotHUD.render(guiGraphics);
                     ManaHUD.render(guiGraphics);
+                    KingdomCoreFaceHUD.render(guiGraphics);
                 }
             }
         });
