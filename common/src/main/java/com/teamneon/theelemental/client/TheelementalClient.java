@@ -7,6 +7,7 @@ import com.teamneon.theelemental.client.tooltip.ModTooltips;
 import com.teamneon.theelemental.helpers.ElementRegistry;
 import com.teamneon.theelemental.item.property.ElementIdProperty;
 import com.teamneon.theelemental.item.property.SpellVariantProperty;
+import com.teamneon.theelemental.menu.ElementalRuneCutterScreen;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeScreen;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
@@ -34,7 +35,11 @@ public class TheelementalClient {
         registrars.menuScreens(screens -> {
             // Use the BalmMenuTypeRegistration as the holder
             screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
+            screens.register(ModMenuTypes.RUNE_CUTTER_MENU, ElementalRuneCutterScreen::new);
+
         });
+
+
 
         registrars.blockColors(colors -> {
             colors.register(

@@ -40,8 +40,11 @@ public class ModCommands {
                                                         Balm.networking().sendTo(player, new SyncSpellInfoPacket(
                                                                 spellId,
                                                                 spell.getName(),
+                                                                SpellRegistry.getSpellDescription(spellId, manager),
                                                                 spell.getManaCost(),
-                                                                spell.getCooldownTicks()
+                                                                spell.getCooldownTicks(),
+                                                                SpellRegistry.getSpellDuration(spellId, manager),
+                                                                SpellRegistry.getRequiredLevel(spellId, manager)
                                                         ));
                                                     }
                                                 }

@@ -54,8 +54,11 @@ public class ElementalEvents {
                 Balm.networking().sendTo(player, new SyncSpellInfoPacket(
                         info.spellId,
                         info.name,
+                        info.description,
                         info.manaCost,
-                        info.cooldownTicks
+                        info.cooldownTicks,
+                        info.durationTicks,
+                        info.requiredLevel
                 ));
 
             }

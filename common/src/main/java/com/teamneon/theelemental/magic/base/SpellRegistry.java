@@ -13,6 +13,7 @@ public class SpellRegistry {
     private static final Map<Integer, SpellFactory> SPELLS = new HashMap<>();
     private static final Map<Integer, Integer> SPELL_COUNT = new HashMap<>();
 
+
     private static final Spell EMPTY = new Spell(0, 0, "") {
         @Override
         public SpellCastResult execute(net.minecraft.world.level.Level level,
@@ -147,6 +148,48 @@ public class SpellRegistry {
             return EMPTY;
         }
     }
+
+    public static int getSpellDuration(int spellId, ResourceManager manager) {
+        try {
+            Map<String, Object> json = SpellJsonLoader.getFullSpellJson(spellId, manager);
+            // We use Number to handle various JSON numeric formats safely before converting to int
+            return ((Number) json.getOrDefault("Duration", 0)).intValue();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static String getSpellName(int spellId, ResourceManager manager) {
+        try {
+            Map<String, Object> json =
+                    SpellJsonLoader.getFullSpellJson(spellId, manager);
+            return (String) json.getOrDefault("SpellName", "");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+
+    public static int getRequiredLevel(int spellId, ResourceManager manager) {
+        try {
+            Map<String, Object> json =
+                    SpellJsonLoader.getFullSpellJson(spellId, manager);
+            return ((Number) json.getOrDefault("RequiredLevel", 0)).intValue();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static String getSpellDescription(int spellId, ResourceManager manager) {
+        try {
+            Map<String, Object> json = SpellJsonLoader.getFullSpellJson(spellId, manager);
+            // Using "Description" as the key to match your JSON structure
+            return (String) json.getOrDefault("Description", "No description available.");
+        } catch (Exception e) {
+            return "No description available.";
+        }
+    }
+
 
     public static Set<Integer> getAllSpellIds() {
         return SPELLS.keySet();

@@ -13,25 +13,23 @@ public class SpellInfoServerHelper {
      */
     public static ClientSpellInfo loadSpellInfo(int spellId, ResourceManager manager) {
         try {
-            // 1️⃣ Load full JSON for the spell
             Map<String, Object> spellJson = SpellJsonLoader.getFullSpellJson(spellId, manager);
 
-            // 2️⃣ Extract values
             String name = (String) spellJson.getOrDefault("SpellName", "Unknown Spell");
+            // Extract the Description from the JSON
+            String description = (String) spellJson.getOrDefault("Description", "No description provided.");
 
-            Number manaNum = (Number) spellJson.getOrDefault("ManaCost", 0);
-            int manaCost = manaNum.intValue();
+            int manaCost = ((Number) spellJson.getOrDefault("ManaCost", 0)).intValue();
+            int cooldown = ((Number) spellJson.getOrDefault("Cooldown", 0)).intValue();
+            int duration = ((Number) spellJson.getOrDefault("Duration", 0)).intValue(); // Read from JSON
+            int requiredLevel = ((Number) spellJson.getOrDefault("RequiredLevel", 0)).intValue();
 
-            Number cooldownNum = (Number) spellJson.getOrDefault("Cooldown", 0);
-            int cooldown = cooldownNum.intValue();
-
-            // 3️⃣ Create the client-friendly SpellInfo
-            return new ClientSpellInfo(spellId, name, manaCost, cooldown);
+            // Return the updated constructor including the description
+            return new ClientSpellInfo(spellId, name, description, manaCost, cooldown, duration,  requiredLevel);
 
         } catch (Exception e) {
-            // Fallback: if JSON fails, log and return dummy SpellInfo
             System.err.println("Failed to load SpellInfo for spellId " + spellId + ": " + e.getMessage());
-            return new ClientSpellInfo(spellId, "Unknown Spell", 0, 0);
-        }
+            // Fallback object matching the updated ClientSpellInfo constructor
+            return new ClientSpellInfo(spellId, "Unknown", "", 0, 0, 0, 0);        }
     }
 }

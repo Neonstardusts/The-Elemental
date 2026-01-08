@@ -3,6 +3,7 @@
   "ManaCost": 60,
   "Cooldown": 400,
   "Duration": 1000,
+  "RequiredLevel": 0,
   "Description": "Place a blazing sigil that ignites the air around it. Any creature entering the sigil is engulfed in an explosive burst of fire.",
   "RecipeItems": {
     "minecraft:blaze_powder": 3,

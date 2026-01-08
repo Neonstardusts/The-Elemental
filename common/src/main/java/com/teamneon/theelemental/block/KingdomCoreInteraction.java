@@ -1,6 +1,7 @@
 package com.teamneon.theelemental.block;
 
 import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
+import com.teamneon.theelemental.client.ClientSpellInfo;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.helpers.ElementRegistry;
@@ -8,10 +9,13 @@ import com.teamneon.theelemental.helpers.SpellJsonLoader;
 import com.teamneon.theelemental.item.ModItems;
 import com.teamneon.theelemental.kingdoms.KingdomSavedData;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
+import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
+import com.teamneon.theelemental.menu.ElementalRuneCutterMenu;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeMenu;
 import com.teamneon.theelemental.store.ModComponents;
 import com.teamneon.theelemental.store.RuneData;
+import com.teamneon.theelemental.store.SpellInfoServerHelper;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.world.BalmMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -21,12 +25,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
@@ -89,93 +95,63 @@ public class KingdomCoreInteraction {
             player.displayClientMessage(Component.literal("The Kingdom Core radius increased to " + (int)newRadius) , true);
             return InteractionResult.CONSUME;
         }
-        else if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
-            // Get player's elemental data
-            ElementalData data = ElementalDataHandler.get(player);
-
-            // Element of the Kingdom Core
-            int elementId = core.getElement();
-
-            // 1. Generate a random SpellID for this element
-            int baseId = elementId * 1000; // e.g., Fire = 1000, Water = 2000
-            int maxSpells = SpellRegistry.getSpellCountForElement(elementId); // total number of spells for this element
-
-            if (maxSpells <= 0) {
-                player.displayClientMessage(Component.literal("No spells registered for this element!"), true);
-                return InteractionResult.FAIL;
-            }
-
-            int randomOffset = (int) (Math.random() * maxSpells) + 1; // +1 so 1001 instead of 1000
-            int spellId = baseId + randomOffset;
-
-            // 2. Lookup the RecipeItems JSON for this spell
-            Map<String, Integer> recipeItems;
-            try {
-                recipeItems = SpellJsonLoader.getRecipeForSpell(spellId, world.getServer().getResourceManager());
-            } catch (Exception e) {
-                player.displayClientMessage(Component.literal("Failed to load recipe for spell " + spellId), true);
-                return InteractionResult.FAIL;
-            }
-
+        // Right-clicking with a Blank Rune
+        if (stack.getItem() == ModItems.BLANK_RUNE.asItem()) {
             if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer) {
-                // Get the ResourceManager
-                var manager = serverPlayer.level().getServer().getResourceManager();
 
-                // 3. Transform Blank Rune into Element Rune
-                ItemStack elementRune = new ItemStack(ModItems.ELEMENT_RUNE.asItem());
+                // --- 4️⃣ Send SpellInfo metadata to client ---
+                ResourceManager manager = serverPlayer.level().getServer().getResourceManager();
 
-                try {
-                    // Read JSON for the spell
-                    Map<String, Object> spellJson = SpellJsonLoader.getFullSpellJson(spellId, manager);
-                    String spellName = (String) spellJson.getOrDefault("SpellName", "Unknown Spell");
-                    Number manaNum = (Number) spellJson.getOrDefault("ManaCost", 0);
-                    int manaCost = manaNum.intValue();
-                    Number cooldownNum = (Number) spellJson.getOrDefault("Cooldown", 0);
-                    int cooldown = cooldownNum.intValue();
-                    String description = (String) spellJson.getOrDefault("Description", "No description");
-                    Number durationNum = (Number) spellJson.getOrDefault("Duration", 0); // or "Duration" if that's your key
-                    int durationTicks = durationNum.intValue();
+                // Loop through all spells in your registry
+                for (int spellId : SpellRegistry.getAllSpellIds()) {
+                    // Skip ID 0 (empty spell)
+                    if (spellId <= 0) continue;
 
-                    // Create RuneData with spellName
-                    RuneData runeData = new RuneData(elementId, spellId, spellName, recipeItems, manaCost, cooldown, description, durationTicks);
-                    // When the rune is updated:
-                    float combinedValue = (float) (elementId * 10) + (spellId % 4);
+                    // Load the spell JSON and extract metadata
+                    ClientSpellInfo info = SpellInfoServerHelper.loadSpellInfo(spellId, manager);
 
-                    // 2. Wrap it in a List of Floats
-                    List<Float> floatList = List.of(combinedValue);
+// Send each field individually
+                    Balm.networking().sendTo(player, new SyncSpellInfoPacket(
+                            info.spellId,
+                            info.name,
+                            info.description,
+                            info.manaCost,
+                            info.cooldownTicks,
+                            info.durationTicks,
+                            info.requiredLevel
+                    ));
 
-                    // 3. Create the component (passing empty lists for flags, colors, and strings)
-                    // The constructor usually looks like: (floats, flags, colors, strings)
-                    CustomModelData component = new CustomModelData(floatList, List.of(), List.of(), List.of());
-                    stack.set(DataComponents.CUSTOM_MODEL_DATA, component);
-
-                    // Attach component to ItemStack
-                    elementRune.set(ModComponents.rune.value(), runeData);
-
-                    // Give player the Element Rune
-                    stack.shrink(1); // remove Blank Rune
-                    if (!player.getInventory().add(elementRune)) {
-                        player.drop(elementRune, false);
-                    }
-
-                    // Give player the Element Rune
-                    stack.shrink(1); // remove Blank Rune
-                    if (!player.getInventory().add(elementRune)) {
-                        player.drop(elementRune, false);
-                    }
-
-                    player.displayClientMessage(Component.literal("Your Rune has been attuned! Spell: " + spellName), true);
-
-                } catch (Exception e) {
-                    // Handle missing/invalid JSON
-                    player.displayClientMessage(Component.literal("Failed to load spell JSON for spell " + spellId), true);
-                    e.printStackTrace(); // Log for debugging
                 }
+
+                // Create the menu provider
+                BalmMenuProvider<ModMenuTypes.RuneCutterData> runeCutterProvider = new BalmMenuProvider<>() {
+                    @Override
+                    public Component getDisplayName() {
+                        return Component.translatable("container.theelemental.rune_cutter");
+                    }
+
+                    @Override
+                    public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player p) {
+                        // Pass element = 0 or read from Kingdom Core / context if needed
+                        return new ElementalRuneCutterMenu(windowId, inv, ContainerLevelAccess.NULL, core.getElement());
+                    }
+
+                    @Override
+                    public ModMenuTypes.RuneCutterData getScreenOpeningData(ServerPlayer player) {
+                        return new ModMenuTypes.RuneCutterData(core.getElement());
+                    }
+
+                    @Override
+                    public StreamCodec<RegistryFriendlyByteBuf, ModMenuTypes.RuneCutterData> getScreenStreamCodec() {
+                        return ModMenuTypes.RuneCutterData.STREAM_CODEC;
+                    }
+                };
+
+                // Open the menu for the server player
+                Balm.networking().openMenu(serverPlayer, runeCutterProvider);
             }
 
-
-            player.displayClientMessage(Component.literal("Your Blank Rune has been attuned! SpellID: " + spellId), true);
-            return InteractionResult.CONSUME;
+            return InteractionResult.SUCCESS; // client side will just return SUCCESS
         }
 
         else {
@@ -251,7 +227,6 @@ public class KingdomCoreInteraction {
                     };
                     Balm.networking().openMenu(player, soulForgeProvider);
                 }
-// Now this call will NO LONGER CRASH on Fabric!
 
 
             } else {

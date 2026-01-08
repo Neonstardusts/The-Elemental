@@ -2,6 +2,7 @@
   "SpellName": "Fireball",
   "ManaCost": 20,
   "Cooldown": 40,
+  "RequiredLevel": 0,
   "Description": "A fiery ball that burns enemies",
   "RecipeItems": {
     "minecraft:blaze_rod": 1,

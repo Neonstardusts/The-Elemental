@@ -49,8 +49,11 @@ public record C2SAssignSpellsPacket(List<Integer> spellIds) implements CustomPac
                     Balm.networking().sendTo(player, new SyncSpellInfoPacket(
                             spellId,
                             spell.getName(),
+                            SpellRegistry.getSpellDescription(spellId, manager),
                             spell.getManaCost(),
-                            spell.getCooldownTicks()
+                            spell.getCooldownTicks(),
+                            SpellRegistry.getSpellDuration(spellId, manager),
+                            SpellRegistry.getRequiredLevel(spellId, manager)
                     ));
                 }
             }

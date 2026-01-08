@@ -23,7 +23,6 @@ public class ModItems {
         ELEMENT_RUNE = items.register("rune_element", ElementRune::new).asDeferredItem();
         SPELL_RUNE= items.register("rune_spell", SpellRune::new).asDeferredItem();
 
-        MAGIC_TEST_ITEM = items.register("magic_test_item", MagicTestItem::new).asDeferredItem();
         KINGDOM_CORE_ITEM = items.register("kingdom_starter", KingdomCoreItem::new).asDeferredItem();
     }
     public static void initialize(BalmCreativeModeTabRegistrar creativeModeTabs) {
