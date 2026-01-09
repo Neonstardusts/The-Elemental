@@ -1,0 +1,21 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "theelemental:element_id",
+    "entries": [
+      { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/fire_spell" } },
+      { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/light_spell" } },
+      { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/sorcery_spell" } },
+      { "threshold": 4.0, "model": { "type": "minecraft:model", "model": "theelemental:item/earth_spell" } },
+      { "threshold": 5.0, "model": { "type": "minecraft:model", "model": "theelemental:item/storm_spell" } },
+      { "threshold": 6.0, "model": { "type": "minecraft:model", "model": "theelemental:item/ocean_spell" } },
+      { "threshold": 7.0, "model": { "type": "minecraft:model", "model": "theelemental:item/dark_spell" } },
+      { "threshold": 8.0, "model": { "type": "minecraft:model", "model": "theelemental:item/warped_spell" } },
+      { "threshold": 9.0, "model": { "type": "minecraft:model", "model": "theelemental:item/wind_spell" } }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "theelemental:item/rune_default"
+    }
+  }
+}

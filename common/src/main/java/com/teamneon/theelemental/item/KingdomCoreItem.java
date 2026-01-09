@@ -46,20 +46,17 @@ public class KingdomCoreItem extends Item {
         List<String> textures = List.of(
                 "steve_place_new.png",
 
-                "steve_use_core.png",
-
-                "steve_use_core.png"
+                "steve_teleport.png"
         );
 
         List<Component> lines = List.of(
                 Component.literal("Use on a desired location"),
                 Component.literal("creating the core of your kingdom."),
 
-                Component.literal("Double {Shift+Right Click}"),
-                Component.literal("on the kingdom core, to teleport to spawn."),
+                Component.literal("Using it on the elemental altar will randomly disperse you."),
+                Component.literal("If your elements kingdom already exists you will teleport there.")
 
-                Component.literal("{Right Click} to open the soul forge"),
-                Component.literal("the place where you assign spells.")
+
         );
 
         return Optional.of(new InfoTooltipComponentData(textures, lines));
@@ -74,95 +71,73 @@ public class KingdomCoreItem extends Item {
         ServerLevel serverLevel = (ServerLevel) level;
         Player player = context.getPlayer();
         BlockPos clickedPos = context.getClickedPos();
+        BlockState clickedState = level.getBlockState(clickedPos);
 
-        // Only elemental creatures can create kingdoms
+        // 1. Requirement: Only elemental creatures
         int playerElement = ElementalDataHandler.get(player).getElement();
         if (playerElement <= 0) {
             player.displayClientMessage(Component.literal("Only an elemental creature can create a kingdom!"), true);
             return InteractionResult.FAIL;
         }
 
-        BlockPos corePos = clickedPos.above();
+        // 2. Interaction: Elemental Altar (Spread Players)
+        // Assuming the Altar is the "World Altar" registered with element -1 or a specific block
+        if (clickedState.is(ModBlocks.ELEMENTAL_ALTAR.asBlock())) { // Replace with your actual Altar block check
+            serverLevel.getServer().getCommands().performPrefixedCommand(
+                    serverLevel.getServer().createCommandSourceStack(),
+                    String.format("spreadplayers %d %d 500 2000 false @p", clickedPos.getX(), clickedPos.getZ())
+            );
+            return InteractionResult.SUCCESS;
+        }
+
         KingdomSavedData globalData = KingdomSavedData.get(serverLevel);
         BlockPos existingCorePos = globalData.getCorePos(playerElement);
 
-        // Otherwise, check restrictions
-        Component tooCloseMessage = getTooCloseMessage(corePos, serverLevel, globalData);
-
-        if (tooCloseMessage != null) {
-            player.displayClientMessage(tooCloseMessage, true);
-            return InteractionResult.FAIL;
-        }
-
-
-        // Kingdom exists? Teleport player to it
+        // 3. Logic: Teleport to existing Kingdom (Skip proximity checks)
         if (existingCorePos != null) {
             if (serverLevel.getBlockEntity(existingCorePos) instanceof KingdomCoreBlockEntity core) {
-
                 UUID playerId = player.getUUID();
 
-                // Check if player is already a member
-                if (core.getMembers().contains(playerId)) {
-                    player.displayClientMessage(
-                            Component.literal("You are already a member of this Kingdom!"),
-                            true
+                if (!core.getMembers().contains(playerId)) {
+                    core.addMember(playerId);
+                    serverLevel.getServer().getPlayerList().broadcastSystemMessage(
+                            Component.literal(player.getName().getString() + " has joined the " + ElementRegistry.getName(playerElement) + " Kingdom!"),
+                            false
                     );
-                    return InteractionResult.FAIL; // Stop here if already a member
                 }
 
-                // Player is not a member yet, add them
-                core.addMember(playerId);
-
-                player.displayClientMessage(
-                        Component.literal("Kingdom already exists! Teleporting and joining..."),
-                        true
-                );
-
-                serverLevel.getServer().getPlayerList().broadcastSystemMessage(
-                        Component.literal(
-                                player.getName().getString()
-                                        + " has joined the "
-                                        + ElementRegistry.getName(playerElement)
-                                        + " Kingdom!"
-                        ),
-                        false
-                );
-
-
+                player.displayClientMessage(Component.literal("Teleporting to your Kingdom core..."), true);
                 if (player instanceof ServerPlayer serverPlayer) {
                     teleportToNearestSafeSpot(serverPlayer, existingCorePos.getX(), existingCorePos.getY(), existingCorePos.getZ(), ElementRegistry.getColor(playerElement));
                 }
-//updated
+
                 context.getItemInHand().shrink(1);
                 return InteractionResult.SUCCESS;
             }
         }
 
+        // 4. Placement logic: Only check distance if we are creating a NEW one
+        BlockPos corePos = clickedPos.above();
 
         if (!serverLevel.dimension().equals(Level.OVERWORLD)) {
             player.displayClientMessage(Component.literal("Kingdoms can only be created in the Overworld!"), true);
             return InteractionResult.FAIL;
         }
 
+        Component tooCloseMessage = getTooCloseMessage(corePos, serverLevel, globalData);
+        if (tooCloseMessage != null) {
+            player.displayClientMessage(tooCloseMessage, true);
+            return InteractionResult.FAIL;
+        }
 
-        serverLevel.setBlock(
-                corePos,
-                ModBlocks.KINGDOM_CORE
-                        .defaultBlockState()
-                        .setValue(KingdomCoreBlock.ELEMENTCore, playerElement),
-                3
-        );
+        // 5. Create the Kingdom
+        serverLevel.setBlock(corePos, ModBlocks.KINGDOM_CORE.asBlock().defaultBlockState().setValue(KingdomCoreBlock.ELEMENTCore, playerElement), 3);
         globalData.registerCore(playerElement, corePos);
+
+        // Anchor Logic
         BlockPos anchorPos = KingdomAnchorHelper.getAnchorPos(serverLevel, playerElement);
         if (anchorPos != null) {
-            serverLevel.setBlock(
-                    anchorPos,
-                    ModBlocks.KINGDOM_ANCHOR
-                            .defaultBlockState()
-                            .setValue(KingdomAnchor.ELEMENT, playerElement),
-                    3
-            );
-
+            serverLevel.setBlock(anchorPos, ModBlocks.KINGDOM_ANCHOR.asBlock().defaultBlockState().setValue(KingdomAnchor.ELEMENT, playerElement), 3);
         }
 
         if (serverLevel.getBlockEntity(corePos) instanceof KingdomCoreBlockEntity core) {
@@ -179,30 +154,34 @@ public class KingdomCoreItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-
     private Component getTooCloseMessage(BlockPos pos, ServerLevel level, KingdomSavedData globalData) {
-
-        // Check spawn
+        // Check World Altar
         BlockPos spawn = globalData.getCorePos(-1);
-        if (pos.distSqr(spawn) < maxRadius * maxRadius) {
-            return Component.literal("You cannot create a Kingdom too close to the ")
-                    .append(Component.literal("World Altar").withStyle(ChatFormatting.AQUA))
-                    .append(Component.literal("!"));
-        }
-
-        // Check all other kingdoms
-        for (int element = 1; element <= 9; element++) {
-            BlockPos corePos = globalData.getCorePos(element);
-            if (corePos != null && pos.distSqr(corePos) < maxRadius * maxRadius) {
-                String elementName = ElementRegistry.getName(element); // name of kingdom
-                int color = ElementRegistry.getColor(element); // color
-
-                return Component.literal("You cannot create a Kingdom too close to the ")
-                        .append(Component.literal(elementName + " Kingdom!").withStyle(style -> style.withColor(color)));
+        if (spawn != null) {
+            double dist = Math.sqrt(pos.distSqr(spawn));
+            if (dist < maxRadius) {
+                return Component.literal("Too close to the ")
+                        .append(Component.literal("World Altar").withStyle(ChatFormatting.AQUA))
+                        .append(Component.literal(String.format(" (%.0f/%d blocks)", dist, maxRadius)));
             }
         }
 
-        return null; // safe
+        // Check Other Kingdoms
+        for (int element = 1; element <= 9; element++) {
+            BlockPos otherPos = globalData.getCorePos(element);
+            if (otherPos != null) {
+                double dist = Math.sqrt(pos.distSqr(otherPos));
+                if (dist < maxRadius) {
+                    String elementName = ElementRegistry.getName(element);
+                    int color = ElementRegistry.getColor(element);
+
+                    return Component.literal("Too close to the ")
+                            .append(Component.literal(elementName + " Kingdom!").withStyle(style -> style.withColor(color)))
+                            .append(Component.literal(String.format(" (%.0f/%d blocks)", dist, maxRadius)));
+                }
+            }
+        }
+        return null;
     }
 
 

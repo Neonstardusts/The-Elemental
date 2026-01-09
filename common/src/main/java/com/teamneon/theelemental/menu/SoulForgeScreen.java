@@ -44,20 +44,40 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
 
     private void sendAssignmentPacket() {
         List<Integer> spellIds = new ArrayList<>();
+        var playerData = ClientElementalData.get();
+        int playerElement = playerData.getElement(); // Assuming this returns the ID (e.g., 1 for Fire, 2 for Water)
 
         // Loop through the 8 Forge slots in the Menu
         for (int i = 0; i < 8; i++) {
             ItemStack stack = this.menu.getSlot(i).getItem();
-            RuneData data = stack.get(ModComponents.rune.value());
+            RuneData runeData = stack.get(ModComponents.rune.value());
 
-            if (!stack.isEmpty() && data != null) {
-                spellIds.add(data.spellId());
+            if (!stack.isEmpty() && runeData != null) {
+                int spellId = runeData.spellId();
+
+                // Get the first digit (The Element Digit)
+                // Example: spellId 105 -> element 1. spellId 2012 -> element 2.
+                int spellElement = Integer.parseInt(Integer.toString(Math.abs(spellId)).substring(0, 1));
+
+                if (spellElement != playerElement) {
+                    // 1. Send failure message to player
+                    if (this.minecraft.player != null) {
+                        this.minecraft.player.displayClientMessage(
+                                Component.literal("Spell elementally incompatible!"),
+                                true
+                        );
+                    }
+                    // 2. Close the menu immediately
+                    this.onClose();
+                    return; // Stop the process; do not send the packet
+                }
+
+                spellIds.add(spellId);
             } else {
                 spellIds.add(0); // Empty or non-rune item
             }
         }
-
-        // Send the IDs to the server
+        // If we passed all checks, send the IDs to the server
         Balm.networking().sendToServer(new C2SAssignSpellsPacket(spellIds));
     }
 

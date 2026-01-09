@@ -3,132 +3,15 @@
     "type": "minecraft:range_dispatch",
     "property": "theelemental:element_id",
     "entries": [
-      {
-        "threshold": 1.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/fire_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/fire_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/fire_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/fire_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/fire_v0" }
-        }
-      },
-      {
-        "threshold": 2.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/light_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/light_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/light_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/light_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/light_v0" }
-        }
-      },
-      {
-        "threshold": 3.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/sorcery_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/sorcery_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/sorcery_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/sorcery_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/sorcery_v0" }
-        }
-      },
-      {
-        "threshold": 4.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/earth_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/earth_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/earth_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/earth_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/earth_v0" }
-        }
-      },
-      {
-        "threshold": 5.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/storm_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/storm_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/storm_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/storm_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/storm_v0" }
-        }
-      },
-      {
-        "threshold": 6.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/ocean_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/ocean_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/ocean_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/ocean_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/ocean_v0" }
-        }
-      },
-      {
-        "threshold": 7.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/dark_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/dark_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/dark_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/dark_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/dark_v0" }
-        }
-      },
-      {
-        "threshold": 8.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/warped_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/warped_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/warped_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/warped_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/warped_v0" }
-        }
-      },
-      {
-        "threshold": 9.0,
-        "model": {
-          "type": "minecraft:range_dispatch",
-          "property": "theelemental:spell_variant",
-          "entries": [
-            { "threshold": 0.0, "model": { "type": "minecraft:model", "model": "theelemental:item/wind_v0" } },
-            { "threshold": 1.0, "model": { "type": "minecraft:model", "model": "theelemental:item/wind_v1" } },
-            { "threshold": 2.0, "model": { "type": "minecraft:model", "model": "theelemental:item/wind_v2" } },
-            { "threshold": 3.0, "model": { "type": "minecraft:model", "model": "theelemental:item/wind_v3" } }
-          ],
-          "fallback": { "type": "minecraft:model", "model": "theelemental:item/wind_v0" }
-        }
-      }
+      { "threshold": 1.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/fire_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 2.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/light_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 3.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/sorcery_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 4.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/earth_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 5.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/storm_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 6.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/ocean_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 7.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/dark_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 8.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/warped_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } },
+      { "threshold": 9.0, "model": { "type": "minecraft:composite", "models": [ { "type": "minecraft:model", "model": "theelemental:item/wind_spell" }, { "type": "minecraft:model", "model": "theelemental:item/broken_overlay" } ] } }
     ],
     "fallback": {
       "type": "minecraft:model",
