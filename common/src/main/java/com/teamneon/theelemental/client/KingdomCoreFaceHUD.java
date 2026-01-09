@@ -1,20 +1,20 @@
 package com.teamneon.theelemental.client;
 
+import com.teamneon.theelemental.block.KingdomCoreBlock;
 import com.teamneon.theelemental.block.entity.KingdomCoreBlockEntity;
 import com.teamneon.theelemental.client.tooltip.InfoTooltipComponent;
 import com.teamneon.theelemental.client.tooltip.InfoTooltipComponentData;
 import com.teamneon.theelemental.helpers.ElementRegistry;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.teamneon.theelemental.Theelemental.id;
 
 public class KingdomCoreFaceHUD {
 
@@ -38,99 +38,100 @@ public class KingdomCoreFaceHUD {
 
         if (faceName == null) return;
 
+        BlockState state = mc.level.getBlockState(pos);
+        if (!(state.getBlock() instanceof KingdomCoreBlock)) return;
+
+        int elementValue = state.hasProperty(KingdomCoreBlock.ELEMENTCore)
+                ? state.getValue(KingdomCoreBlock.ELEMENTCore)
+                : 0;
+
         int width = mc.getWindow().getGuiScaledWidth();
         int height = mc.getWindow().getGuiScaledHeight();
-        int color = 0xFF000000 | ElementRegistry.getColor(core.getElement());
+        int color = 0xFF000000 | ElementRegistry.getColor(elementValue);
 
-        boolean shift = mc.options.keyShift.isDown(); // Shift detection
+        boolean shift = mc.options.keyShift.isDown();
 
-        // --- Draw Face Name ---
+        // --- 1. Draw Face Name (Title) ---
         int x = width / 2 - mc.font.width(faceName) / 2;
         int y = height - 100;
 
         // Background for Face Name
-        int bgWidth = mc.font.width(faceName) + 4;
-        int bgHeight = 12; // Add extra if hint will be rendered
-        guiGraphics.fill(x - 4, y - 4, x + bgWidth, y + bgHeight, 0x90000000);
-
-        // Draw main face name
+        int bgWidth = mc.font.width(faceName) + 8;
+        guiGraphics.fill(x - 4, y - 4, x + bgWidth - 4, y + 12, 0x90000000);
         guiGraphics.drawString(mc.font, faceName, x, y, color, true);
 
         if (!shift) {
-            guiGraphics.pose().pushMatrix();
-            float scale = 0.75f; // 75% size
-            guiGraphics.pose().scale(scale, scale);
-
-            String hintText = "ℹ ꜱʜɪꜰᴛ";
-
-            // Calculate centered x/y with scale applied
-            // Divide the full window width by scale, then subtract text width
-            int hintX = (int) ((width / scale / 2) - (mc.font.width(hintText) / 2));
-            int hintY = (int) ((y + mc.font.lineHeight + 2) / scale);
-
-            guiGraphics.drawString(
-                    mc.font,
-                    hintText,
-                    hintX,
-                    hintY,
-                    0xFF888888,
-                    true
-            );
-
-            guiGraphics.pose().popMatrix();
-        }
-
-        else {
-            // --- Draw full tooltip below face name ---
-            InfoTooltipComponentData data = getTooltipForFace(face);
+            renderShiftHint(guiGraphics, mc, width, y);
+        } else {
+            // --- 2. Draw Wrapped Tooltip with Background ---
+            InfoTooltipComponentData data = getTooltipForFace(mc, face);
             if (data != null) {
                 InfoTooltipComponent tooltip = new InfoTooltipComponent(data);
-                int tooltipX = width / 2 - tooltip.getWidth(mc.font) / 2;
-                int tooltipY = y + mc.font.lineHeight + 6; // a bit below face name
+
+                int tooltipWidth = tooltip.getWidth(mc.font);
+                int tooltipHeight = tooltip.getHeight(mc.font);
+                int tooltipX = width / 2 - tooltipWidth / 2;
+                int tooltipY = y + mc.font.lineHeight + 6;
+
+                // --- NEW BLACK BACKGROUND BOX ---
+                guiGraphics.fill(
+                        tooltipX - 4,
+                        tooltipY - 4,
+                        tooltipX + tooltipWidth + 4,
+                        tooltipY + tooltipHeight + 4,
+                        0x90000000
+                );
+
                 tooltip.renderImage(
                         mc.font,
                         tooltipX,
                         tooltipY,
-                        tooltip.getWidth(mc.font),
-                        tooltip.getHeight(mc.font),
+                        tooltipWidth,
+                        tooltipHeight,
                         guiGraphics
                 );
             }
         }
     }
 
-    // --- Map face → tooltip data ---
-    private static InfoTooltipComponentData getTooltipForFace(Direction face) {
+    private static void renderShiftHint(GuiGraphics guiGraphics, Minecraft mc, int width, int y) {
+        guiGraphics.pose().pushMatrix();
+        float scale = 0.75f;
+        guiGraphics.pose().scale(scale, scale);
+        String hintText = "ℹ ꜱʜɪꜰᴛ";
+        int hintX = (int) ((width / scale / 2) - (mc.font.width(hintText) / 2));
+        int hintY = (int) ((y + mc.font.lineHeight + 2) / scale);
+        guiGraphics.drawString(mc.font, hintText, hintX, hintY, 0xFF888888, true);
+        guiGraphics.pose().popMatrix();
+    }
+
+    private static InfoTooltipComponentData getTooltipForFace(Minecraft mc, Direction face) {
+        int wrapWidth = 200;
+        List<Component> lines = new ArrayList<>();
+
         return switch (face) {
-            case NORTH -> new InfoTooltipComponentData(
-                    List.of("steve_teleport.png"),
-                    List.of(
-                            Component.literal("Warp Stone"),
-                            Component.literal("Teleports you to the World Altar")
-                    )
-            );
-            case EAST -> new InfoTooltipComponentData(
-                    List.of("steve_use_core.png"),
-                    List.of(
-                            Component.literal("Soul Forge"),
-                            Component.literal("Apply spells to player")
-                    )
-            );
-            case SOUTH -> new InfoTooltipComponentData(
-                    List.of("steve_ame_dia.png"),
-                    List.of(
-                            Component.literal("Crystal Chamber"),
-                            Component.literal("Convert amethyst to mana, use diamonds to increase kingdom radius")
-                    )
-            );
-            case WEST -> new InfoTooltipComponentData(
-                    List.of("steve_rune.png"),
-                    List.of(
-                            Component.literal("Spell Inscriber"),
-                            Component.literal("Imprint spells onto elemental amalgam")
-                    )
-            );
+            case NORTH -> {
+                addWrapped(lines, mc, "Teleports you to the World Altar", wrapWidth);
+                yield new InfoTooltipComponentData(List.of("steve_teleport.png"), lines);
+            }
+            case EAST -> {
+                addWrapped(lines, mc, "Apply spells to player", wrapWidth);
+                yield new InfoTooltipComponentData(List.of("steve_use_core.png"), lines);
+            }
+            case SOUTH -> {
+                addWrapped(lines, mc, "Convert amethyst to mana, use diamonds to increase kingdom radius", wrapWidth);
+                yield new InfoTooltipComponentData(List.of("steve_ame_dia.png"), lines);
+            }
+            case WEST -> {
+                addWrapped(lines, mc, "Imprint spells onto elemental amalgam", wrapWidth);
+                yield new InfoTooltipComponentData(List.of("steve_rune.png"), lines);
+            }
             default -> null;
         };
+    }
+
+    private static void addWrapped(List<Component> list, Minecraft mc, String text, int width) {
+        mc.font.getSplitter().splitLines(text, width, net.minecraft.network.chat.Style.EMPTY)
+                .forEach(line -> list.add(Component.literal(line.getString())));
     }
 }

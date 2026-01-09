@@ -5,6 +5,7 @@ import com.teamneon.theelemental.magic.network.CanCastSpellResultPacket;
 import com.teamneon.theelemental.magic.network.SpellCastPacket;
 import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
 import com.teamneon.theelemental.menu.C2SAssignSpellsPacket;
+import com.teamneon.theelemental.menu.C2SChooseElementPacket;
 import net.blay09.mods.balm.network.BalmNetworking;
 
 public class ModNetworking {
@@ -56,6 +57,14 @@ public class ModNetworking {
                 CanCastSpellResultPacket.class,
                 CanCastSpellResultPacket.STREAM_CODEC,
                 (player, message) -> CanCastSpellResultPacket.handle(player, message)
+        );
+
+        // C2S: ElementChooser packet
+        networking.registerServerboundPacket(
+                C2SChooseElementPacket.TYPE,
+                C2SChooseElementPacket.class,
+                C2SChooseElementPacket.STREAM_CODEC,
+                (player, message) -> C2SChooseElementPacket.handle(player, message)
         );
 
     }

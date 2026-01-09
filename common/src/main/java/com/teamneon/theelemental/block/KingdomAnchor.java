@@ -66,43 +66,21 @@ public class KingdomAnchor extends Block {
 
         int ToElement = getElementFromAnchor((ServerLevel) world, pos);
 
-        if (player.isShiftKeyDown()) {
-            UUID playerId = player.getUUID();
-            long currentTime = world.getGameTime();
+        KingdomSavedData globalData = KingdomSavedData.get((ServerLevel) world);
+        BlockPos altarPos = globalData.getCorePos(ToElement);
 
-            ClickTracker tracker = shiftClickTracker.getOrDefault(playerId, new ClickTracker());
-
-            // Reset click count if more than 20 ticks (~1 sec) since last
-            if (currentTime - tracker.lastClickTime > 20) tracker.clickCount = 0;
-
-            tracker.clickCount++;
-            tracker.lastClickTime = currentTime;
-
-            shiftClickTracker.put(playerId, tracker);
-
-            if (tracker.clickCount >= 2) {    // Get global data
-                KingdomSavedData globalData = KingdomSavedData.get((ServerLevel) world);
-                BlockPos altarPos = globalData.getCorePos(ToElement);
-
-                if (altarPos != null) {
-                    // Teleport player to the altar
-                    teleportToNearestSafeSpot(player, altarPos.getX(), altarPos.getY(), altarPos.getZ(), ElementRegistry.getColor(ToElement));
-                } else {
-                    // Fallback if altar not yet registered
-                    player.displayClientMessage(Component.literal("The " + ElementRegistry.getName(ToElement) + " kingdom core, does not yet exist."), true);
-                }
-
-                // Reset click tracker
-                tracker.clickCount = 0;
-                shiftClickTracker.put(playerId, tracker);
-
-                return InteractionResult.CONSUME;
-            }
-
-            // Optional feedback for first click
-            player.displayClientMessage(Component.literal("Shift-right-click again to teleport..."), true);
-            return InteractionResult.CONSUME;
+        if (altarPos != null) {
+            teleportToNearestSafeSpot(
+                    player,
+                    altarPos.getX(),
+                    altarPos.getY(),
+                    altarPos.getZ(),
+                    ElementRegistry.getColor(ToElement)
+            );
+        } else {
+            player.displayClientMessage(Component.literal("No Kingdom Found."), true);
         }
+
 
         return InteractionResult.CONSUME;
     }

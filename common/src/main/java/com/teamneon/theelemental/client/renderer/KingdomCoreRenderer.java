@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -19,11 +20,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
+
 public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlockEntity, KingdomCoreRenderState> {
 
     public KingdomCoreRenderer(BlockEntityRendererProvider.Context context) {
         // Nothing special needed
     }
+
 
     @Override
     public KingdomCoreRenderState createRenderState() {
@@ -31,20 +34,36 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
     }
 
     @Override
-    public void extractRenderState(KingdomCoreBlockEntity be, KingdomCoreRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
+    public void extractRenderState(
+            KingdomCoreBlockEntity be,
+            KingdomCoreRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            ModelFeatureRenderer.CrumblingOverlay crumbling
+    ) {
         BlockEntityRenderState.extractBase(be, state, crumbling);
-        int element = 0;
-        if (be.getLevel() != null) {
-            BlockState blockState = be.getLevel().getBlockState(be.getBlockPos());
-            element = blockState.getValue(KingdomCoreBlock.ELEMENTCore);
-        }
 
-        state.animationTime = be.getLevel() != null ? (float) Math.floorMod(be.getLevel().getGameTime(), 40) + partialTick : 0.0F;
+        state.valid = false; // ❗ default to invalid
+        state.level = null;
+
+        if (be.getLevel() == null) return;
+
+        BlockState blockState = be.getLevel().getBlockState(be.getBlockPos());
+        if (!(blockState.getBlock() instanceof KingdomCoreBlock)) return;
+        if (!blockState.hasProperty(KingdomCoreBlock.ELEMENTCore)) return;
+
+        int element = blockState.getValue(KingdomCoreBlock.ELEMENTCore);
+
+        state.animationTime =
+                (float) Math.floorMod(be.getLevel().getGameTime(), 40) + partialTick;
+
         state.color = 0xFF000000 | ElementRegistry.getColor(element);
         state.worldPosition = be.getBlockPos();
         state.level = be.getLevel();
-        state.radius = be.getRadius(); // ✅ copy radius from BE
+        state.radius = be.getRadius();
+        state.valid = true; // ✅ safe to render
     }
+
 
     @Override
     public boolean shouldRenderOffScreen() {
@@ -67,6 +86,9 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
     @Override
     public void submit(KingdomCoreRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
         // 1️⃣ Draw beacon beam
+
+        if (!state.valid || state.level == null) return; // ✅ HARD STOP
+
         BeaconRenderer.submitBeaconBeam(
                 poseStack,
                 collector,
@@ -80,12 +102,20 @@ public class KingdomCoreRenderer implements BlockEntityRenderer<KingdomCoreBlock
                 0.4F                      // outer radius
         );
 
+
+
         // 2️⃣ Get the radius directly from the BE
-        float radius = state.level.getBlockEntity(state.worldPosition) instanceof KingdomCoreBlockEntity be
-                ? be.getRadius()
-                : state.radius;
+        float radius = state.radius;
+
+        if (state.level != null) {
+            BlockEntity be = state.level.getBlockEntity(state.worldPosition);
+            if (be instanceof KingdomCoreBlockEntity core) {
+                radius = core.getRadius();
+            }
+        }
 
         final float dynamicRadius = radius;
+
 
 
         // 2️⃣ Draw forcefield ring at player Y level

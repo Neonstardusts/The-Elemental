@@ -5,8 +5,10 @@ import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.ModBlocks;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
 import com.teamneon.theelemental.helpers.ElementRegistry;
+import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.item.property.ElementIdProperty;
 import com.teamneon.theelemental.item.property.SpellVariantProperty;
+import com.teamneon.theelemental.menu.ElementChooserScreen;
 import com.teamneon.theelemental.menu.ElementalRuneCutterScreen;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeScreen;
@@ -36,27 +38,46 @@ public class TheelementalClient {
             // Use the BalmMenuTypeRegistration as the holder
             screens.register(ModMenuTypes.SOULFORGE_MENU, SoulForgeScreen::new);
             screens.register(ModMenuTypes.RUNE_CUTTER_MENU, ElementalRuneCutterScreen::new);
+            screens.register(ModMenuTypes.ELEMENT_CHOOSER_MENU, ElementChooserScreen::new);
 
         });
 
 
 
         registrars.blockColors(colors -> {
+            // --- KINGDOM ANCHOR ---
             colors.register(
                     (state, level, pos, tintIndex) -> {
-                        int element = state.getValue(ELEMENT);
-                        return ElementRegistry.getColor(element) & 0xFFFFFF;
+                        if (state.hasProperty(ELEMENT)) {
+                            int element = state.getValue(ELEMENT);
+                            return ElementRegistry.getColor(element);
+                        }
+                        return 0xFFFFFF; // Default white if property is missing
                     },
                     ModBlocks.KINGDOM_ANCHOR
             );
 
+            // --- KINGDOM CORE ---
             colors.register(
                     (state, level, pos, tintIndex) -> {
-                        int element = state.getValue(ELEMENTCore);
-                        return ElementRegistry.getColor(element) & 0xFFFFFF;
+                        if (state.hasProperty(ELEMENTCore)) {
+                            int element = state.getValue(ELEMENTCore);
+                            return ElementRegistry.getColor(element);
+                        }
+                        return 0xFFFFFF;
                     },
                     ModBlocks.KINGDOM_CORE
             );
+
+            /*
+            // --- ELEMENTAL ALTAR (Rainbow) ---
+            colors.register(
+                    (state, level, pos, tintIndex) -> {
+                        // This will update the block's color every frame to match your HUD
+                        return UtilityHelper.getRainbowColor(10000);
+                    },
+                    ModBlocks.ELEMENTAL_ALTAR
+            );*/
         });
 
 
@@ -77,11 +98,13 @@ public class TheelementalClient {
         RenderCallback.Gui.AFTER.register((guiGraphics, window) -> {
             Minecraft client = Minecraft.getInstance();
             if (client.player != null) {
+                // to put or not display here
                 if (ClientElementalData.get().getElement() > 0) {
                     SlotHUD.render(guiGraphics);
                     ManaHUD.render(guiGraphics);
-                    KingdomCoreFaceHUD.render(guiGraphics);
                 }
+                KingdomCoreFaceHUD.render(guiGraphics);
+                BlockInfoHUD.render(guiGraphics);
             }
         });
 

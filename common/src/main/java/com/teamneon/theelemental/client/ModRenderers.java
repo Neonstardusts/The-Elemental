@@ -3,6 +3,7 @@ package com.teamneon.theelemental.client;
 import com.teamneon.theelemental.block.entity.ModBlockEntities;
 import com.teamneon.theelemental.block.renderer.WorldCrafterEntityRenderer;
 import com.teamneon.theelemental.block.renderer.WorldCrafterPillarEntityRenderer;
+import com.teamneon.theelemental.client.renderer.ElementalAltarRenderer;
 import com.teamneon.theelemental.client.renderer.KingdomCoreRenderer;
 import net.blay09.mods.balm.client.renderer.blockentity.BalmBlockEntityRendererRegistrar;
 
@@ -18,6 +19,11 @@ public class ModRenderers {
         renderers.register(
                 ModBlockEntities.KINGDOM_CORE_REG.asHolder(),
                 KingdomCoreRenderer::new
+        );
+
+        renderers.register(
+                ModBlockEntities.ELEMENTAL_ALTAR_REG.asHolder(),
+                ElementalAltarRenderer::new
         );
 
         renderers.register(

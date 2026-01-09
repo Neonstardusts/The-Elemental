@@ -9,11 +9,36 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
+import net.blay09.mods.balm.platform.event.callback.ServerTickCallback;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.WeakHashMap;
 
 public class UtilityHelper {
+
+    private static final WeakHashMap<ServerLevel, List<Runnable>> nextTickTasks = new WeakHashMap<>();
+
+    static {
+        // Permanent tick listener
+        ServerTickCallback.ServerLevelTick.AFTER.register(level -> {
+            List<Runnable> tasks = nextTickTasks.get(level);
+            if (tasks != null) {
+                for (Runnable task : tasks) {
+                    task.run();
+                }
+                tasks.clear();
+            }
+        });
+    }
+
+
+    public static void runNextTick(ServerLevel level, Runnable task) {
+        nextTickTasks.computeIfAbsent(level, l -> new ArrayList<>()).add(task);
+    }
+
 
     /**
      * Attempts to teleport the player to a safe nearby location.
@@ -57,7 +82,22 @@ public class UtilityHelper {
         );
 
         // Spawn particles at current position
-        spawnDust(level, player.getX(), player.getY()+1, player.getZ(), color, 50,0.5, 0.75, 0.5, 0.02, 3);
+        UtilityHelper.runNextTick(level, () -> {
+            UtilityHelper.spawnDust(
+                    level,
+                    safePos.getX() + 0.5,
+                    safePos.getY() + 1.5,
+                    safePos.getZ() + 0.5,
+                    color,
+                    50,
+                    0.5, 0.75, 0.5,
+                    0.02,
+                    3
+            );
+        });
+
+
+
 
         // Teleport player slightly above the block
         player.teleportTo(
@@ -285,6 +325,42 @@ public class UtilityHelper {
         int hash = s.hashCode();
         float r = ((hash & 0xFFFFFFFFL) / (float)0x100000000L); // 0..1
         return min + (max - min) * r; // scale to min..max
+    }
+
+    /**
+     * Calculates a rainbow color based on the current system time.
+     * Purely mathematical, no AWT/Graphics dependencies.
+     * @param speed Speed of the cycle (e.g., 5000 is 5 seconds per loop)
+     * @return The resulting RGB color as an integer
+     */
+    public static int getRainbowColor(int speed) {
+        float hue = (System.currentTimeMillis() % speed) / (float) speed;
+        return hsbToRgb(hue, 0.7f, 1.0f);
+    }
+
+    /**
+     * Manual HSB to RGB conversion to avoid using java.awt.Color
+     */
+    private static int hsbToRgb(float h, float s, float b) {
+        float r = 0, g = 0, blue = 0;
+        if (s == 0) {
+            r = g = blue = b;
+        } else {
+            float hPos = (h - (float)Math.floor(h)) * 6.0f;
+            float f = hPos - (float)Math.floor(hPos);
+            float p = b * (1.0f - s);
+            float q = b * (1.0f - s * f);
+            float t = b * (1.0f - (s * (1.0f - f)));
+            switch ((int) hPos) {
+                case 0 -> { r = b; g = t; blue = p; }
+                case 1 -> { r = q; g = b; blue = p; }
+                case 2 -> { r = p; g = b; blue = t; }
+                case 3 -> { r = p; g = q; blue = b; }
+                case 4 -> { r = t; g = p; blue = b; }
+                case 5 -> { r = b; g = p; blue = q; }
+            }
+        }
+        return ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(blue * 255);
     }
 
 

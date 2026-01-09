@@ -26,16 +26,22 @@ public class ModMenuTypes {
        ------------------------ */
     public record RuneCutterData(int element) {
         public static final StreamCodec<RegistryFriendlyByteBuf, RuneCutterData> STREAM_CODEC = StreamCodec.of(
-                // 1. ENCODER (Value, Buffer)
                 (buf, data) -> buf.writeInt(data.element()),
-                // 2. DECODER (Buffer)
                 buf -> new RuneCutterData(buf.readInt())
         );
     }
 
-
-
     public static Holder<MenuType<ElementalRuneCutterMenu>> RUNE_CUTTER_MENU;
+
+    /* ------------------------
+       ELEMENT CHOOSER
+       ------------------------ */
+    public record ElementChooserData() {
+        public static final StreamCodec<RegistryFriendlyByteBuf, ElementChooserData> STREAM_CODEC =
+                StreamCodec.unit(new ElementChooserData());
+    }
+
+    public static Holder<MenuType<ElementChooserMenu>> ELEMENT_CHOOSER_MENU;
 
     public static void initialize(BalmMenuTypeRegistrar menus) {
         // SoulForge
@@ -55,13 +61,25 @@ public class ModMenuTypes {
         RUNE_CUTTER_MENU = menus.register("rune_cutter_menu", new BalmMenuFactory<ElementalRuneCutterMenu, RuneCutterData>() {
             @Override
             public ElementalRuneCutterMenu create(int windowId, Inventory inventory, RuneCutterData data) {
-                // Use the element sent from the server
                 return new ElementalRuneCutterMenu(windowId, inventory, ContainerLevelAccess.NULL, data.element());
             }
 
             @Override
             public StreamCodec<RegistryFriendlyByteBuf, RuneCutterData> getStreamCodec() {
                 return RuneCutterData.STREAM_CODEC;
+            }
+        }).asHolder();
+
+        // Element Chooser
+        ELEMENT_CHOOSER_MENU = menus.register("element_chooser_menu", new BalmMenuFactory<ElementChooserMenu, ElementChooserData>() {
+            @Override
+            public ElementChooserMenu create(int windowId, Inventory inventory, ElementChooserData data) {
+                return new ElementChooserMenu(windowId, inventory, inventory.player);
+            }
+
+            @Override
+            public StreamCodec<RegistryFriendlyByteBuf, ElementChooserData> getStreamCodec() {
+                return ElementChooserData.STREAM_CODEC;
             }
         }).asHolder();
     }

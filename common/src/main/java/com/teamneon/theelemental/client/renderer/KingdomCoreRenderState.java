@@ -9,5 +9,7 @@ public class KingdomCoreRenderState extends BlockEntityRenderState {
     public int color;
     public BlockPos worldPosition;
     public Level level;      // store level for surface queries
-    public float radius;     // store radius for rendering the ring
+    public float radius;
+    public boolean valid;
+// store radius for rendering the ring
 }
