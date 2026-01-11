@@ -4,6 +4,7 @@ import net.blay09.mods.balm.world.level.block.BalmBlockRegistrar;
 import net.blay09.mods.balm.world.level.block.DeferredBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.PushReaction;
 
 public class ModBlocks {
 
@@ -16,14 +17,19 @@ public class ModBlocks {
     public static DeferredBlock WORLD_CRAFTER_PILLAR;
 
     public static void initialize(BalmBlockRegistrar blocks) {
-        yourBlock = blocks.register("your_block", Block::new, it -> it.strength(1.5f)).withDefaultItem().asDeferredBlock();
-        ELEMENTAL_ALTAR = blocks.register("elemental_altar", ElementalAltar::new,  it -> it.strength(1.5f)).withDefaultItem().asDeferredBlock();
-        WORLD_REACTOR = blocks.register("world_reactor", WorldReactor::new,  it -> it.strength(1.5f)).withDefaultItem().asDeferredBlock();
-        KINGDOM_CORE = blocks.register("kingdom_core", KingdomCoreBlock::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
-        KINGDOM_ANCHOR = blocks.register("kingdom_anchor", KingdomAnchor::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
-        WORLD_CRAFTER = blocks.register("world_crafter", WorldCrafter::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
-        WORLD_CRAFTER_PILLAR = blocks.register("world_crafter_pillar", WorldCrafterPillar::new, it -> it.strength(5.0f).noOcclusion()).withDefaultItem().asDeferredBlock();
+        yourBlock = blocks.register("your_block", Block::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK)).withDefaultItem().asDeferredBlock();
 
+        ELEMENTAL_ALTAR = blocks.register("elemental_altar", ElementalAltar::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK)).withDefaultItem().asDeferredBlock();
+
+        WORLD_REACTOR = blocks.register("world_reactor", WorldReactor::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK)).withDefaultItem().asDeferredBlock();
+
+        KINGDOM_CORE = blocks.register("kingdom_core", KingdomCoreBlock::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK).noOcclusion()).withDefaultItem().asDeferredBlock();
+
+        KINGDOM_ANCHOR = blocks.register("kingdom_anchor", KingdomAnchor::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK).noOcclusion()).withDefaultItem().asDeferredBlock();
+
+        WORLD_CRAFTER = blocks.register("world_crafter", WorldCrafter::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK).noOcclusion()).withDefaultItem().asDeferredBlock();
+
+        WORLD_CRAFTER_PILLAR = blocks.register("world_crafter_pillar", WorldCrafterPillar::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK).noOcclusion()).withDefaultItem().asDeferredBlock();
     }
 
 }
