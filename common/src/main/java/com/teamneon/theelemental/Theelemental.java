@@ -9,6 +9,7 @@ import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.network.ModNetworking;
 import com.teamneon.theelemental.network.SyncElementalDataPacket;
+import com.teamneon.theelemental.particles.ModParticles;
 import com.teamneon.theelemental.store.ModComponents;
 import com.teamneon.theelemental.store.RuneData;
 import com.teamneon.theelemental.worldcrafter.ModRecipes;
@@ -43,6 +44,7 @@ public class Theelemental {
         // ---- REGISTRIES ----
         registrars.dataComponentTypes(ModComponents::initialize);
 
+        registrars.particleTypes(ModParticles::initialize);
 
         registrars.blocks(ModBlocks::initialize);
         registrars.items(ModItems::initialize);

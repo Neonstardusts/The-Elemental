@@ -12,6 +12,8 @@ import com.teamneon.theelemental.menu.ElementChooserScreen;
 import com.teamneon.theelemental.menu.ElementalRuneCutterScreen;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeScreen;
+import com.teamneon.theelemental.particles.ModParticles;
+import com.teamneon.theelemental.particles.SorceryParticle;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
 import net.blay09.mods.balm.client.platform.event.callback.RenderCallback;
 import net.blay09.mods.balm.client.platform.event.callback.ScreenCallback;
@@ -42,6 +44,9 @@ public class TheelementalClient {
 
         });
 
+        registrars.particleProviders((registrar) -> {
+            registrar.register(ModParticles.SORCERY_PARTICLE.asHolder(), SorceryParticle.Provider::new);
+        });
 
 
         registrars.blockColors(colors -> {

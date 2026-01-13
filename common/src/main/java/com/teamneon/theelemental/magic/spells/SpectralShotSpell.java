@@ -3,6 +3,7 @@ package com.teamneon.theelemental.magic.spells;
 import com.teamneon.theelemental.magic.base.ActiveSpellManager;
 import com.teamneon.theelemental.magic.base.DurationSpell;
 import com.teamneon.theelemental.magic.base.SpellCastResult;
+import com.teamneon.theelemental.particles.ModParticles;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
@@ -22,39 +23,69 @@ public class SpectralShotSpell extends DurationSpell {
 
     @Override
     public void tick(Level level, Player player) {
-        if (level.isClientSide()) return; // Only run on server
+        if (level.isClientSide()) return;
 
-        // 1. Get the block the player is looking at (raycast)
-        double reachDistance = 20.0; // how far the spell targets
+        // 1. Rate Limiting: Every 5 ticks
+        if (player.tickCount % 5 != 0) return;
+
+        // 2. Target acquisition
+        double reachDistance = 40.0;
         HitResult hitResult = player.pick(reachDistance, 0.0f, false);
-
-        if (hitResult.getType() != HitResult.Type.BLOCK) {
-            return; // No target block, exit
-        }
-
         Vec3 targetPos = hitResult.getLocation();
 
-        // 2. Launch multiple arrows from around/above the player
-        int arrowCount = 5; // number of arrows in volley
+        // 3. Find spawn position (behind and above)
         Random random = new Random();
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 spawnPos = null;
 
-        for (int i = 0; i < arrowCount; i++) {
-            // Random spawn position above the player
-            double offsetX = (random.nextDouble() - 0.5) * 2.0; // -1 to 1
-            double offsetZ = (random.nextDouble() - 0.5) * 2.0; // -1 to 1
-            double spawnY = player.getY() + 3.0 + random.nextDouble(); // 3-4 blocks above
+        for (int i = 0; i < 10; i++) {
+            double offsetX = (random.nextDouble() - 0.5) * 10.0;
+            double offsetY = random.nextDouble() * 5.0 + 3.0;
+            double offsetZ = (random.nextDouble() - 0.5) * 10.0;
 
-            Vec3 spawnPos = player.position().add(offsetX, spawnY - player.getY(), offsetZ);
+            Vec3 potentialPos = player.position().add(offsetX, offsetY, offsetZ);
+            Vec3 toPotential = potentialPos.subtract(player.position()).normalize();
 
-            // Direction toward target
-            Vec3 direction = targetPos.subtract(spawnPos).normalize();
+            if (toPotential.dot(lookVec) < 0) {
+                spawnPos = potentialPos;
+                break;
+            }
+        }
 
+        if (spawnPos == null) spawnPos = player.position().add(0, 5, 0);
 
-            Arrow arrow = new Arrow(level, player, new ItemStack(Items.ARROW), null);
-            arrow.setOwner(player);
-            arrow.setDeltaMovement(direction.scale(2.0)); // speed multiplier
-            arrow.pickup = AbstractArrow.Pickup.DISALLOWED; // prevents arrow from being picked up
-            level.addFreshEntity(arrow);
+        // 4. Calculate flight math
+        Vec3 trajectory = targetPos.subtract(spawnPos);
+        Vec3 direction = trajectory.normalize();
+        double speed = 3.0;
+
+        // 5. Spawn the arrow
+        Arrow arrow = new Arrow(level, player, new ItemStack(Items.ARROW), null);
+        arrow.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+        arrow.setDeltaMovement(direction.scale(speed));
+        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        arrow.addTag("spectral_shot");
+        arrow.setNoGravity(true);
+
+        level.addFreshEntity(arrow);
+
+        // 6. Particle Trail (The first 3 blocks of flight)
+        // We use ServerLevel to ensure everyone nearby sees the magic
+        net.minecraft.server.level.ServerLevel serverLevel = (net.minecraft.server.level.ServerLevel) level;
+        double trailLength = 10.0;
+        double stepSize = 0.3; // Distance between each particle
+
+        for (double d = 0; d < trailLength; d += stepSize) {
+            // Position = Start + (Direction * Distance)
+            Vec3 particlePos = spawnPos.add(direction.scale(d));
+
+            serverLevel.sendParticles(
+                    ModParticles.SORCERY_PARTICLE.asSupplier().get(),
+                    particlePos.x, particlePos.y, particlePos.z,
+                    2,     // count
+                    0.05, 0.05, 0.05, // spread/jitter
+                    0.02   // speed
+            );
         }
     }
 
