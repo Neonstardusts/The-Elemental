@@ -3,7 +3,12 @@ package com.teamneon.theelemental.client;
 
 import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.ModBlocks;
+import com.teamneon.theelemental.client.model.ModModelLayers;
+import com.teamneon.theelemental.client.model.WaterSpellModel;
+import com.teamneon.theelemental.client.renderer.WaterSpellRenderer;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
+import com.teamneon.theelemental.entity.ModEntities;
+import com.teamneon.theelemental.entity.WaterSpellEntity;
 import com.teamneon.theelemental.helpers.ElementRegistry;
 import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.item.property.ElementIdProperty;
@@ -34,6 +39,21 @@ public class TheelementalClient {
         registrars.blockEntityRenderers(ModRenderers::initialize);
         registrars.clientTooltipComponents(ModTooltips::initialize);
 
+
+        registrars.entityRenderers(registrar -> {
+            registrar.register(
+                    ModEntities.WATER_SPELL,
+                    WaterSpellRenderer::new
+            );
+        });
+
+        registrars.modelLayers(registrar -> {
+            registrar.register(
+                    ModModelLayers.WATER_SPELL.model(), // The Identifier/ResourceLocation
+                    ModModelLayers.WATER_SPELL.layer(), // The layer name ("main")
+                    WaterSpellModel::createBodyLayer     // The geometry definition
+            );
+        });
 
 
         registrars.menuScreens(screens -> {

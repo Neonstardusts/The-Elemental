@@ -4,6 +4,7 @@ import com.teamneon.theelemental.block.entity.ModBlockEntities;
 import com.teamneon.theelemental.client.ModRenderers;
 import com.teamneon.theelemental.command.ModCommands;
 import com.teamneon.theelemental.data.ElementalDataHandler;
+import com.teamneon.theelemental.entity.ModEntities;
 import com.teamneon.theelemental.events.ElementalEvents;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.menu.ModMenuTypes;
@@ -43,6 +44,8 @@ public class Theelemental {
 
         // ---- REGISTRIES ----
         registrars.dataComponentTypes(ModComponents::initialize);
+
+        registrars.entityTypes(ModEntities::initialize);
 
         registrars.particleTypes(ModParticles::initialize);
 
