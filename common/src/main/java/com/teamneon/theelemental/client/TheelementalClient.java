@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.ModBlocks;
 import com.teamneon.theelemental.client.model.ModModelLayers;
 import com.teamneon.theelemental.client.model.WaterSpellModel;
+import com.teamneon.theelemental.client.renderer.SpawnLightningRenderer;
 import com.teamneon.theelemental.client.renderer.WaterSpellRenderer;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
 import com.teamneon.theelemental.entity.ModEntities;
@@ -40,10 +41,16 @@ public class TheelementalClient {
         registrars.clientTooltipComponents(ModTooltips::initialize);
 
 
+
         registrars.entityRenderers(registrar -> {
             registrar.register(
                     ModEntities.WATER_SPELL,
                     WaterSpellRenderer::new
+            );
+
+            registrar.register(
+                    ModEntities.SPAWN_LIGHTNING,
+                    SpawnLightningRenderer::new
             );
         });
 

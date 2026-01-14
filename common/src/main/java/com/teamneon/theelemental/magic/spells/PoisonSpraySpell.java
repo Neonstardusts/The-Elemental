@@ -21,51 +21,56 @@ public class PoisonSpraySpell extends DurationSpell {
 
     @Override
     public void tick(Level level, Player player) {
-        int particleCount = 30;
-        double coneAngle = Math.toRadians(30);
-        double range = 5.0;
+        if (!(level instanceof ServerLevel serverLevel)) return;
 
-        for (int i = 0; i < particleCount; i++) {
-            double theta = (Math.random() - 0.5) * coneAngle;
-            double phi = (Math.random() - 0.5) * coneAngle;
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 look = player.getLookAngle().normalize();
 
-            Vec3 look = player.getLookAngle();
+        // 1. Start point 0.5 blocks ahead of eyes
+        Vec3 startPoint = eyePos.add(look.scale(0.5));
 
-            double cosTheta = Math.cos(theta);
-            double sinTheta = Math.sin(theta);
-            double cosPhi = Math.cos(phi);
-            double sinPhi = Math.sin(phi);
+        double range = 5.0; // Total length of the cone
+        int rings = 5;      // Number of "steps" forward
+        int perRing = 6;    // Particles per step
 
-            double x1 = look.x * cosTheta - look.z * sinTheta;
-            double z1 = look.x * sinTheta + look.z * cosTheta;
-            double y1 = look.y;
+        // Find orthogonal vectors to the look vector to build the circles
+        Vec3 up = new Vec3(0, 1, 0);
+        if (Math.abs(look.y) > 0.9) up = new Vec3(1, 0, 0); // Avoid parallel vectors
+        Vec3 right = look.cross(up).normalize();
+        Vec3 vertical = look.cross(right).normalize();
 
-            double x2 = x1 * cosPhi - y1 * sinPhi;
-            double y2 = x1 * sinPhi + y1 * cosPhi;
-            double z2 = z1;
+        for (int i = 1; i <= rings; i++) {
+            double distance = (i / (double) rings) * range;
+            // The radius grows as we move further away (the "fanning out" effect)
+            double radius = distance * 0.4;
 
-            Vec3 particlePos = player.position()
-                    .add(0, player.getEyeHeight() * 0.5, 0)
-                    .add(x2 * range, y2 * range, z2 * range);
+            Vec3 ringCenter = startPoint.add(look.scale(distance));
 
-            if (level instanceof ServerLevel serverLevel) {
+            for (int j = 0; j < perRing; j++) {
+                double angle = (j / (double) perRing) * Math.PI * 2;
+
+                // Calculate particle position on the ring
+                Vec3 offset = right.scale(Math.cos(angle) * radius)
+                        .add(vertical.scale(Math.sin(angle) * radius));
+                Vec3 particlePos = ringCenter.add(offset);
+
+                // Particles
                 serverLevel.sendParticles(
-                        new DustColorTransitionOptions(0x6ca35f, 0x9be675, 1f),
+                        new DustColorTransitionOptions(0x6ca35F, 0x9BE675, 1f),
                         particlePos.x, particlePos.y, particlePos.z,
-                        1, 0, 0, 0, 0.1
+                        1, 0, 0, 0, 0.0
                 );
+            }
 
-                DamageSource source = serverLevel.damageSources().playerAttack(player);
-                AABB area = new AABB(
-                        particlePos.x - 0.5, particlePos.y - 0.5, particlePos.z - 0.5,
-                        particlePos.x + 0.5, particlePos.y + 0.5, particlePos.z + 0.5
-                );
+            // Damage logic: Check a larger area once per ring rather than per particle
+            AABB damageArea = new AABB(ringCenter.subtract(radius, radius, radius),
+                    ringCenter.add(radius, radius, radius));
 
-                for (LivingEntity entity : serverLevel.getEntitiesOfClass(LivingEntity.class, area)) {
-                    if (entity != player && entity.isAlive()) {
-                        entity.invulnerableTime = 0;
-                        entity.hurtServer(serverLevel, source, 2.0f);
-                    }
+            DamageSource source = serverLevel.damageSources().playerAttack(player);
+            for (LivingEntity entity : serverLevel.getEntitiesOfClass(LivingEntity.class, damageArea)) {
+                if (entity != player && entity.isAlive()) {
+                    entity.invulnerableTime = 0;
+                    entity.hurtServer(serverLevel, source, 1.0f); // Reduced damage since it ticks every frame
                 }
             }
         }

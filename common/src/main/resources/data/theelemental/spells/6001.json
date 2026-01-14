@@ -1,7 +1,7 @@
 {
   "SpellName": "Torrent",
   "ManaCost": 20,
-  "Cooldown": 60,
+  "Cooldown": 400,
   "Duration": 200,
   "Description": "Water cycle, duration spell",
   "RecipeItems": {

@@ -45,46 +45,50 @@ public class WaterSpellEntity extends Projectile {
         if (this.entityData.get(MODE) == MODE_ORBIT) {
             handleOrbitLogic();
         } else {
+            // STRAIGHT MODE: Move based on velocity set in the spell
             this.move(MoverType.SELF, this.getDeltaMovement());
+
+            // Spawn trail particles
+            if (this.level().isClientSide()) {
+                this.level().addParticle(ParticleTypes.FALLING_WATER, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+            }
         }
 
+        // Shared Logic: Collisions & Lifespan
         if (!this.level().isClientSide()) {
             // 1. Hit Detection for Mobs
             this.level().getEntities(this, this.getBoundingBox().inflate(0.2)).forEach(target -> {
                 if (target != this.getOwner()) {
                     target.hurt(this.damageSources().magic(), 5.0f);
-                    this.splash(); // Trigger Splash
+                    this.splash();
                     this.discard();
                 }
             });
 
             // 2. Hit Detection for Blocks
             if (!this.level().getBlockState(this.blockPosition()).isAir()) {
-                this.splash(); // Trigger Splash
+                this.splash();
                 this.discard();
             }
 
             // 3. Lifespan check
             if (this.tickCount > this.entityData.get(MAX_LIFE)) {
-                this.discard(); // Usually we don't splash on timeout, but you can add it here if you want
+                this.discard();
             }
         }
     }
 
     /**
-     * Creates the visual and auditory "Splash" effect.
+     * Common effect used when the water ball hits something.
      */
     private void splash() {
         if (this.level() instanceof ServerLevel serverLevel) {
-            // Play Sound: Sound, Category, Pos, Volume, Pitch
             serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(),
                     SoundEvents.GENERIC_SPLASH, SoundSource.NEUTRAL, 0.5f, 1.2f + this.random.nextFloat() * 0.4f);
 
-            // Spawn Particles
-            // Parameters: ParticleType, x, y, z, count, spreadX, spreadY, spreadZ, speed
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY(), this.getZ(),
-                    12, 0.2, 0.2, 0.2, 0.1);
+                    24, 0.3, 0.3, 0.3, 0.1);
 
             serverLevel.sendParticles(ParticleTypes.BUBBLE,
                     this.getX(), this.getY(), this.getZ(),
@@ -95,7 +99,7 @@ public class WaterSpellEntity extends Projectile {
     private void handleOrbitLogic() {
         if (this.getOwner() instanceof Player player) {
             float currentAngle = this.entityData.get(ORBIT_ANGLE);
-            currentAngle += 0.30f;
+            currentAngle += 0.15f;
 
             if (!this.level().isClientSide()) {
                 this.entityData.set(ORBIT_ANGLE, currentAngle);
@@ -111,6 +115,7 @@ public class WaterSpellEntity extends Projectile {
         }
     }
 
+    // --- Helper Setters ---
     public void setMode(int mode) { this.entityData.set(MODE, mode); }
     public void setMaxLife(int ticks) { this.entityData.set(MAX_LIFE, ticks); }
     public void setOrbitAngle(float angle) { this.entityData.set(ORBIT_ANGLE, angle); }

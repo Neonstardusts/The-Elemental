@@ -1,7 +1,7 @@
 {
   "SpellName": "Chain Lightning",
-  "ManaCost": 50,
-  "Cooldown": 60,
+  "ManaCost": 5,
+  "Cooldown": 7,
   "Description": "shoot chain lightning.",
   "RecipeItems": {
     "minecraft:amethyst_shard": 1

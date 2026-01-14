@@ -1,0 +1,9 @@
+{
+  "SpellName": "Water Jet",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "Description": "shoot a jet of water",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}
