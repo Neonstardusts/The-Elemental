@@ -13,6 +13,7 @@ import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
 import com.teamneon.theelemental.menu.ElementalRuneCutterMenu;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeMenu;
+import com.teamneon.theelemental.store.ManaData;
 import com.teamneon.theelemental.store.ModComponents;
 import com.teamneon.theelemental.store.RuneData;
 import com.teamneon.theelemental.store.SpellInfoServerHelper;
@@ -165,21 +166,85 @@ public class KingdomCoreInteraction {
         Item item = stack.getItem();
         ElementalData data = ElementalDataHandler.get(player);
 
+
+        if (data.getElement() != core.getElement()) {
+            player.displayClientMessage(
+                    Component.literal("Your element does not match this Kingdom Core!"),
+                    true
+            );
+            return InteractionResult.FAIL;
+        }
+
         // 1. MANA REFILL (Amethyst Shard)
-        if (item == Items.AMETHYST_SHARD) {
-            if (data.getElement() != core.getElement()) {
-                player.displayClientMessage(
-                        Component.literal("Your element does not match this Kingdom Core!"),
-                        true
-                );
+        if (item == ModItems.MANA_STORING_CRYSTAL.asItem()) {
+            // 1. Get current data
+            ManaData currentData = stack.getOrDefault(ModComponents.mana_storage.value(), ManaData.EMPTY);
+
+            // 2. Check if the crystal is already at the maximum capacity
+            if (currentData.mana() >= 500f) {
+                player.displayClientMessage(Component.literal("This crystal is already at maximum capacity!"), true);
                 return InteractionResult.FAIL;
             }
 
-            data.setCurrentMana(data.getCurrentMana() + 10f);
-            stack.shrink(1);
+            // 3. Check if the player has any Magic Crystals
+            int crystalSlot = player.getInventory().findSlotMatchingItem(new ItemStack(ModItems.MAGIC_CRYSTAL.asItem()));
+            if (crystalSlot == -1) {
+                player.displayClientMessage(Component.literal("You have no Magic Crystals!"), true);
+                return InteractionResult.FAIL;
+            }
 
-            player.displayClientMessage(Component.literal("Your mana increased by 10!"), true);
-            return InteractionResult.CONSUME;
+            // 4. Calculate new value with the 500 cap
+            // Math.min picks the lower of the two values
+            float newManaValue = Math.min(currentData.mana() + 10f, 500f);
+
+            // 5. Update the item stack
+            stack.set(ModComponents.mana_storage.value(), new ManaData(newManaValue));
+
+            // 6. Consume the resource and provide feedback
+            player.getInventory().getItem(crystalSlot).shrink(1);
+            player.displayClientMessage(
+                    Component.literal("Infused Mana! Current: " + (int)newManaValue + "/500"),
+                    true
+            );
+
+            return InteractionResult.SUCCESS; // Changed to SUCCESS to trigger hand animation
+        }
+
+        if (item == ModItems.MAGIC_CRYSTAL.asItem()) {
+            // 1. Get player mana data
+            ElementalData playerLevelData = ElementalDataHandler.get(player);
+            float currentPlayerMana = playerLevelData.getCurrentMana();
+            float playerMax = playerLevelData.getMaxMana();
+
+            // 2. Check if player is already full
+            if (currentPlayerMana >= playerMax) {
+                player.displayClientMessage(Component.literal("Your Mana is already full!"), true);
+                return InteractionResult.FAIL;
+            }
+
+            // 3. Perform the logic on the Server
+            if (!player.level().isClientSide()) {
+                // Calculate how much to add (10 mana, but don't exceed max)
+                float amountToAdd = Math.min(10f, playerMax - currentPlayerMana);
+                float newManaValue = currentPlayerMana + amountToAdd;
+
+                // Update player data
+                playerLevelData.setCurrentMana(newManaValue);
+
+                // Consume 1 crystal from the hand
+                stack.shrink(1);
+
+                // Save and Sync to ensure the client-side UI updates
+                ElementalDataHandler.save(player);
+                ElementalDataHandler.syncToClient(player);
+
+                player.displayClientMessage(
+                        Component.literal("Infused " + (int)amountToAdd + " Mana, " + (int)currentPlayerMana+"/"+(int)playerMax+"!"),
+                        true
+                );
+            }
+
+            return InteractionResult.SUCCESS;
         }
 
         // 2. LEVEL UP (LevelCrystal)
@@ -192,6 +257,7 @@ public class KingdomCoreInteraction {
             ElementalDataHandler.save(player);
             return InteractionResult.SUCCESS;
         }
+
 
         // 3. RADIUS INCREASE (RadiusCrystal)
         if (item == ModItems.RADIUS_CRYSTAL.asItem()) {

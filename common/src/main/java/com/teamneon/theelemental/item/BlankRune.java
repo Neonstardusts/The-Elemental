@@ -25,20 +25,4 @@ public class BlankRune extends Item {
         super(properties.stacksTo(1));
     }
 
-
-    @Override
-    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        // This will automatically handle the Shift logic in the InfoTooltipComponent
-        List<String> textures = List.of(
-                "steve_use_core.png" // one icon
-        );
-
-        List<Component> lines = List.of(
-                Component.literal("Use on your kingdom core"), // first line
-                Component.literal("to learn a spell recipe.") // second line
-        );
-
-        return Optional.of(new InfoTooltipComponentData(textures, lines));
-    }
-
 }

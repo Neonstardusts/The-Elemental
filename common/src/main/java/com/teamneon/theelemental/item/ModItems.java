@@ -31,6 +31,8 @@ public class ModItems {
     public static DeferredItem LEVEL_CRYSTAL;
     public static DeferredItem RADIUS_CRYSTAL;
     public static DeferredItem SLOT_CRYSTAL;
+    public static DeferredItem MANA_STORING_CRYSTAL;
+    public static DeferredItem MAGIC_CRYSTAL;
 
     public static void initialize(BalmItemRegistrar items) {
         BLANK_RUNE = items.register("rune_blank", BlankRune::new).asDeferredItem();
@@ -42,23 +44,30 @@ public class ModItems {
         LEVEL_CRYSTAL = items.register("level_crystal", KingdomCrystal::new).asDeferredItem();
         RADIUS_CRYSTAL = items.register("radius_crystal", KingdomCrystal::new).asDeferredItem();
         SLOT_CRYSTAL = items.register("slot_crystal", KingdomCrystal::new).asDeferredItem();
+        MANA_STORING_CRYSTAL = items.register("mana_storing_crystal", ManaCrystalItem::new).asDeferredItem();
+        MAGIC_CRYSTAL = items.register("magic_crystal", KingdomCrystal::new).asDeferredItem();
+
 
     }
 
     public static void initialize(BalmCreativeModeTabRegistrar creativeModeTabs) {
         creativeModeTabs.register(Theelemental.MOD_ID, builder ->
                 builder.title(Component.translatable(id(Theelemental.MOD_ID).toLanguageKey("itemGroup")))
-                        .icon(() -> ModItems.BLANK_RUNE.createStack())
+                        .icon(() -> ModItems.KINGDOM_CORE_ITEM.createStack())
                         .displayItems((displayParameters, output) -> {
 
                             // 1. Add standard items
-                            output.accept(ModItems.BLANK_RUNE);
+                            output.accept(ModItems.KINGDOM_CORE_ITEM);
+                            output.accept(ModItems.MANA_STORING_CRYSTAL);
+
+                            output.accept(ModItems.MAGIC_CRYSTAL);
                             output.accept(ModItems.LEVEL_CRYSTAL);
                             output.accept(ModItems.RADIUS_CRYSTAL);
                             output.accept(ModItems.SLOT_CRYSTAL);
-                            output.accept(ModItems.KINGDOM_CORE_ITEM);
+
 
                             // 2. Add Spells from the Client Registry (Sorted Numerically)
+                            output.accept(ModItems.BLANK_RUNE);
                             SpellRegistry.getAllSpellIds().stream()
                                     .sorted()
                                     .forEach(spellId -> {

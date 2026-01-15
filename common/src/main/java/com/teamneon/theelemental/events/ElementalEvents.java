@@ -85,7 +85,7 @@ public class ElementalEvents {
         });
 
         ServerTickCallback.ServerPlayerTick.AFTER.register(player -> {
-            if (player.tickCount % 5 != 0) return;
+            if (player.tickCount % 10 != 0) return;
 
             ElementalData data = ElementalDataHandler.get(player);
             if (data == null) return;
