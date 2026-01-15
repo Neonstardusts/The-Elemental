@@ -1,0 +1,9 @@
+{
+  "SpellName": "Ice Shield",
+  "ManaCost": 30,
+  "Cooldown": 60,
+  "Description": "makes a shield of temepory ice",
+  "RecipeItems": {
+    "minecraft:packed_ice": 1
+  }
+}

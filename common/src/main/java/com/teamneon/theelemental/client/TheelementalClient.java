@@ -41,6 +41,9 @@ public class TheelementalClient {
         registrars.blockEntityRenderers(ModRenderers::initialize);
         registrars.clientTooltipComponents(ModTooltips::initialize);
 
+        registrars.blockRenderTypes(registrar -> {
+            registrar.setRenderLayer(ModBlocks.HOLLOW_ICE, net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
+        });
 
 
         registrars.entityRenderers(registrar -> {
