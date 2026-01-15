@@ -1,14 +1,13 @@
-## Version 2.0.0 | The Render Update!
-Made major changes to water and lightning rendering 
+## Version 2.0.0 | Rendering Update!
+Major changes to rendering system and spells
 
-Added:
-- New lightning renderer, no more particles, instead a chain of lightning is created and custom rendered 
-- New water renderer, no more particles or blocks water is no formed as droplets which explode into splashes 
-- New Water Spell: The Water Jet
-- New Sorcery Particles 
+Changes:
+- Added a custom lightning rendering, no longer uses particle trails
+- Water spells no longer use particles or clunky blocks, instead 'water drops' a custom render entity which splashes in contanct with blocks or mobs doing damage
+- New sorcery particles
 
 Spell Updates:
-- Poison Spray: cone fixed
-- Water Torrent: now spawns 7 water droplets which spin around player
-- Spectral Shot: fixed too many arrows and new particles
-- Chain Lightning: no more dust particles custom lightning rendering
+- Fixed poison spell
+- Updated spectral shot arrows and particles
+- Updated Water Torrent with 7 spinning drops
+- New water spell! Water Jet

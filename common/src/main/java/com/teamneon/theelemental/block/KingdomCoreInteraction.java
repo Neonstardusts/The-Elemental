@@ -34,6 +34,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
@@ -161,9 +162,11 @@ public class KingdomCoreInteraction {
     ) {
         if (world.isClientSide()) return InteractionResult.SUCCESS;
 
-        if (stack.getItem() == Items.AMETHYST_SHARD) {
-            ElementalData data = ElementalDataHandler.get(player);
+        Item item = stack.getItem();
+        ElementalData data = ElementalDataHandler.get(player);
 
+        // 1. MANA REFILL (Amethyst Shard)
+        if (item == Items.AMETHYST_SHARD) {
             if (data.getElement() != core.getElement()) {
                 player.displayClientMessage(
                         Component.literal("Your element does not match this Kingdom Core!"),
@@ -179,9 +182,35 @@ public class KingdomCoreInteraction {
             return InteractionResult.CONSUME;
         }
 
-        if (stack.getItem() == Items.DIAMOND) {
+        // 2. LEVEL UP (LevelCrystal)
+        if (item == ModItems.LEVEL_CRYSTAL.asItem()) {
+            data.setLevel(data.getLevel() + 1);
+            player.displayClientMessage(Component.literal("Your level has increased to " + data.getLevel() + ", and max mana to " + data.getMaxMana() + "!"), true);
+
+
+            ElementalDataHandler.syncToClient(player);
+            ElementalDataHandler.save(player);
+            return InteractionResult.SUCCESS;
+        }
+
+        // 3. RADIUS INCREASE (RadiusCrystal)
+        if (item == ModItems.RADIUS_CRYSTAL.asItem()) {
+            // Check if we are already at or above the limit
+            if (core.getRadius() >= 128.0f) {
+                player.displayClientMessage(
+                        Component.literal("The Kingdom Core has reached its maximum radius (128)!"),
+                        true
+                );
+                return InteractionResult.FAIL; // Stops the process and doesn't shrink the stack
+            }
+
+            // Increase radius but clamp it at 128.0f just to be safe
             float newRadius = Math.min(core.getRadius() + 1.0f, 128.0f);
             core.setRadius(newRadius);
+
+            // Crucial: Tell Minecraft the BlockEntity data has changed so it saves to NBT
+            core.setChanged();
+
             stack.shrink(1);
 
             player.displayClientMessage(
@@ -191,7 +220,44 @@ public class KingdomCoreInteraction {
             return InteractionResult.CONSUME;
         }
 
-        return InteractionResult.CONSUME;
+        // 4. SLOT INCREASE (SlotCrystal)
+        if (item == ModItems.SLOT_CRYSTAL.asItem()) {
+            List<Integer> slots = data.getActiveSlots();
+            int unlockedIndex = -1;
+
+            // Find the first -1 in the list
+            for (int i = 0; i < slots.size(); i++) {
+                if (slots.get(i) == -1) {
+                    slots.set(i, 0); // Change the first -1 to 0
+                    unlockedIndex = i;
+                    break; // Stop after unlocking one slot
+                }
+            }
+
+            // Validation: Check if a slot was actually available to unlock
+            if (unlockedIndex == -1) {
+                player.displayClientMessage(
+                        Component.literal("All slots are already unlocked!"),
+                        true
+                );
+                return InteractionResult.FAIL;
+            }
+
+            // Success logic
+            stack.shrink(1);
+
+            // Using (unlockedIndex + 1) makes it "Slot 1" instead of "Slot 0" for the user
+            player.displayClientMessage(
+                    Component.literal("You have unlocked Slot " + (unlockedIndex + 1) + "!"),
+                    true
+            );
+
+            ElementalDataHandler.syncToClient(player);
+            ElementalDataHandler.save(player);
+            return InteractionResult.SUCCESS;
+        }
+
+        return InteractionResult.PASS;
     }
 
     private static InteractionResult openRuneCutter(Level world, Player player, KingdomCoreBlockEntity core) {

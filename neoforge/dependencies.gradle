@@ -2,5 +2,5 @@ dependencies {
     implementation(libs.balmNeoForge) {
         changing = libs.versions.balm.get().contains("SNAPSHOT")
     }
-    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    //implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 }

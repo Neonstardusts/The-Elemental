@@ -23,8 +23,8 @@ public class ModCommands {
             dispatcher.register(
                     Commands.literal("setspell")
                             .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(4))))
-                            .then(Commands.argument("slot", IntegerArgumentType.integer(0, 4))
-                                    .then(Commands.argument("spell", IntegerArgumentType.integer(0))
+                            .then(Commands.argument("slot", IntegerArgumentType.integer(1, 8))
+                                    .then(Commands.argument("spell", IntegerArgumentType.integer(1001))
                                             .executes(ctx -> {
                                                 ServerPlayer player = ctx.getSource().getPlayerOrException();
                                                 int slot = IntegerArgumentType.getInteger(ctx, "slot")-1;

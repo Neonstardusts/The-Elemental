@@ -27,8 +27,10 @@ public class ModItems {
     public static DeferredItem BLANK_RUNE;
     public static DeferredItem ELEMENT_RUNE;
     public static DeferredItem SPELL_RUNE;
-    public static DeferredItem MAGIC_TEST_ITEM;
     public static DeferredItem KINGDOM_CORE_ITEM;
+    public static DeferredItem LEVEL_CRYSTAL;
+    public static DeferredItem RADIUS_CRYSTAL;
+    public static DeferredItem SLOT_CRYSTAL;
 
     public static void initialize(BalmItemRegistrar items) {
         BLANK_RUNE = items.register("rune_blank", BlankRune::new).asDeferredItem();
@@ -36,6 +38,11 @@ public class ModItems {
         SPELL_RUNE= items.register("rune_spell", SpellRune::new).asDeferredItem();
 
         KINGDOM_CORE_ITEM = items.register("kingdom_starter", KingdomCoreItem::new).asDeferredItem();
+
+        LEVEL_CRYSTAL = items.register("level_crystal", KingdomCrystal::new).asDeferredItem();
+        RADIUS_CRYSTAL = items.register("radius_crystal", KingdomCrystal::new).asDeferredItem();
+        SLOT_CRYSTAL = items.register("slot_crystal", KingdomCrystal::new).asDeferredItem();
+
     }
 
     public static void initialize(BalmCreativeModeTabRegistrar creativeModeTabs) {
@@ -46,6 +53,9 @@ public class ModItems {
 
                             // 1. Add standard items
                             output.accept(ModItems.BLANK_RUNE);
+                            output.accept(ModItems.LEVEL_CRYSTAL);
+                            output.accept(ModItems.RADIUS_CRYSTAL);
+                            output.accept(ModItems.SLOT_CRYSTAL);
                             output.accept(ModItems.KINGDOM_CORE_ITEM);
 
                             // 2. Add Spells from the Client Registry (Sorted Numerically)
