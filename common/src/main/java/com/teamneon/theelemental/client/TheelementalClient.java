@@ -18,6 +18,7 @@ import com.teamneon.theelemental.menu.ElementChooserScreen;
 import com.teamneon.theelemental.menu.ElementalRuneCutterScreen;
 import com.teamneon.theelemental.menu.ModMenuTypes;
 import com.teamneon.theelemental.menu.SoulForgeScreen;
+import com.teamneon.theelemental.particles.FrostParticle;
 import com.teamneon.theelemental.particles.ModParticles;
 import com.teamneon.theelemental.particles.SorceryParticle;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
@@ -73,6 +74,8 @@ public class TheelementalClient {
 
         registrars.particleProviders((registrar) -> {
             registrar.register(ModParticles.SORCERY_PARTICLE.asHolder(), SorceryParticle.Provider::new);
+            registrar.register(ModParticles.FROST_PARTICLE.asHolder(), FrostParticle.Provider::new);
+
         });
 
 

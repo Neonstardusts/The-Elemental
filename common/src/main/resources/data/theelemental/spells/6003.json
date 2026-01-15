@@ -1,0 +1,9 @@
+{
+  "SpellName": "Freeze",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "Description": "shoot a ray to freeze blocks or damage mobs",
+  "RecipeItems": {
+    "minecraft:packed_ice": 1
+  }
+}

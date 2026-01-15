@@ -96,6 +96,14 @@ public class SpellRegistry {
                 )
         );
 
+        register(6003, json ->
+                new FreezeSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
         register(7001, json ->
                 new WitherSkullSpell(
                         intVal(json, "ManaCost"),
