@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "IBI",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:book"
+  },
+  "result": {
+    "id": "theelemental:rune_blank",
+    "count": 1
+  }
+}

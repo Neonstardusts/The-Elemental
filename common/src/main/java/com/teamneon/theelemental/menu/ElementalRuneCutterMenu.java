@@ -199,6 +199,15 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
     }
 
     @Override
+    public void removed(Player player) {
+        super.removed(player);
+        // This ensures the item in the input slot is returned to the player or dropped
+        this.access.execute((level, pos) -> {
+            this.clearContainer(player, this.inputContainer);
+        });
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return stillValid(access, player, Blocks.STONECUTTER);
     }

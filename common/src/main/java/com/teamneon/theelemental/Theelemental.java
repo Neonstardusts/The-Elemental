@@ -55,6 +55,7 @@ public class Theelemental {
         registrars.blockEntityTypes(ModBlockEntities::initialize);
         registrars.menuTypes(ModMenuTypes::initialize);
 
+
         SpellRegistry.init();
         ModRecipes.register();
         // Use the registrar to handle networking
@@ -65,7 +66,4 @@ public class Theelemental {
         ModCommands.initialize();
 
     }
-
-
-
 }
