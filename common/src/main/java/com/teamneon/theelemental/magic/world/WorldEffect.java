@@ -8,4 +8,5 @@ public interface WorldEffect {
     void tick(Level level);
     boolean isExpired();
     UUID getOwner();
+    Level getLevel(); // Add this
 }

@@ -96,10 +96,22 @@ public class ElementalEvents {
             ElementalDataHandler.syncToClient(player);
         });
 
+// --- 4. Dimension-specific Ticking ---
+        // Runs once for every loaded dimension (Overworld, Nether, End)
         ServerTickCallback.ServerLevelTick.AFTER.register(level -> {
-            TempBlock.tickAll();
-            ActiveSpellManager.tickAll(level);
+            // Sigils and Ground effects are tied to a specific world
             WorldEffectManager.tickAll(level);
+        });
+
+        // --- 5. Global Server Ticking ---
+        // Runs exactly ONCE per game tick, regardless of dimensions
+        ServerTickCallback.AFTER.register(server -> {
+            // Player spells follow the server heartbeat
+            ActiveSpellManager.tickAllGlobal(server);
+
+            // If TempBlock changes blocks in the world, it might need
+            // to be moved to ServerLevelTick instead, depending on how it's written.
+            TempBlock.tickAll();
         });
 
 

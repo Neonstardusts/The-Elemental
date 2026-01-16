@@ -3,8 +3,12 @@ package com.teamneon.theelemental.item;
 import com.teamneon.theelemental.client.tooltip.InfoTooltipComponentData;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
+import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.store.ManaData;
 import com.teamneon.theelemental.store.ModComponents;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -82,22 +86,39 @@ public class ManaCrystalItem extends Item {
     // 3. Choose the color of the bar (e.g., Light Blue for Mana)
     @Override
     public int getBarColor(ItemStack stack) {
-        // Cyan/Light Blue color in Hex: 0x3498db
-        return 0x2cbedb;
+        int rainbow = UtilityHelper.getPaleRainbowColor(10000);
+
+        return rainbow;
     }
 
+    /*
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        // This will automatically handle the Shift logic in the InfoTooltipComponent
-        List<String> textures = List.of(
-                "steve_use_core.png" // one icon
-        );
+        boolean shift = Minecraft.getInstance().hasShiftDown();
 
-        List<Component> lines = List.of(
-                Component.literal("Use with magic crystals on the kingdom core"), // first line
-                Component.literal("to store mana into the crystal for later use (shift).") // second line
-        );
+        // Use a list to hold your custom lines
+        List<Component> lines = new java.util.ArrayList<>();
 
-        return Optional.of(new InfoTooltipComponentData(textures, lines));
+        if (shift) {
+            // Main Mana Line (The 50 symbols logic can be handled in your TooltipComponent renderer)
+            lines.add(Component.literal("||||||||||||||||||||||||||||||||||||||||||||||||||").withStyle(ChatFormatting.GRAY));
+
+            // Instruction Lines
+            lines.add(Component.literal("[Shift-Right-Click] ").withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal("Store 10 mana into the crystal").withStyle(ChatFormatting.WHITE)));
+
+            lines.add(Component.literal("[Right-Click] ").withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal("Empty the mana into yourself").withStyle(ChatFormatting.WHITE)));
+
+            lines.add(Component.literal("[Right-Click] ").withStyle(ChatFormatting.AQUA) // bluish color
+                    .append(Component.literal("On kingdom core with magic crystals to create 10 mana").withStyle(ChatFormatting.WHITE)));
+        } else {
+            lines.add(Component.literal("ℹ [Shift for more information]").withStyle(ChatFormatting.DARK_GRAY));
+        }
+
+        // Return your custom TooltipComponent data containing the lines
+        return Optional.of(new InfoTooltipComponentData(lines));
     }
+    */
+    
 }

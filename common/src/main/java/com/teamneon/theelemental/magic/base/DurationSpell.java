@@ -13,6 +13,11 @@ public abstract class DurationSpell extends Spell {
         this.durationTicks = durationTicks;
     }
 
+    public void onDurationEnd(Level level, Player player) {
+        // Default implementation does nothing
+    }
+
+
     public abstract void tick(Level level, Player player);
 
     public void onTick() {

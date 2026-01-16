@@ -138,6 +138,15 @@ public class SpellRegistry {
                 )
         );
 
+        register(9002, json ->
+                new AirSpoutSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
+                )
+        );
+
 
     }
 

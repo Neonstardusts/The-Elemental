@@ -18,7 +18,14 @@ public class WorldEffectManager {
         Iterator<WorldEffect> it = effects.iterator();
         while (it.hasNext()) {
             WorldEffect effect = it.next();
+
+            // FIX: If this effect belongs to the Overworld, and the Nether is ticking, skip it.
+            if (effect.getLevel() != level) {
+                continue;
+            }
+
             effect.tick(level);
+
             if (effect.isExpired()) {
                 it.remove();
             }

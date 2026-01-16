@@ -76,6 +76,7 @@ public class PoisonSpraySpell extends DurationSpell {
         }
     }
 
+
     @Override
     public SpellCastResult execute(Level level, Player player) {
         if (!level.isClientSide()) {

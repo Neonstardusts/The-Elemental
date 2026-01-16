@@ -7,12 +7,19 @@ import java.util.UUID;
 public abstract class AbstractWorldEffect implements WorldEffect {
 
     protected final UUID owner;
+    protected final Level level;
     protected int age = 0;
     protected final int maxAge;
 
-    protected AbstractWorldEffect(UUID owner, int maxAge) {
+    protected AbstractWorldEffect(Level level, UUID owner, int maxAge) {
+        this.level = level;
         this.owner = owner;
         this.maxAge = maxAge;
+    }
+
+    @Override
+    public Level getLevel() {
+        return level;
     }
 
     @Override

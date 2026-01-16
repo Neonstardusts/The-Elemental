@@ -16,7 +16,7 @@ import net.minecraft.world.level.ClipContext;
 public class CinderSigilSpell extends Spell {
 
     private static final double RAY_DISTANCE = 12.0;
-    private final long sigilDuration; // how long the sigil will last in ticks
+    private final long sigilDuration;
 
     public CinderSigilSpell(int manaCost, int cooldownTicks, String name, long sigilDuration) {
         super(manaCost, cooldownTicks, name);
@@ -24,24 +24,47 @@ public class CinderSigilSpell extends Spell {
     }
 
     @Override
+    public SpellCastResult checkConditions(Player player, Level level) {
+        // We perform the raycast here to see if the player is actually looking at a block
+        BlockPos hitPos = getTargetBlock(level, player);
+
+        if (hitPos == null) {
+            return SpellCastResult.fail("No valid target block!");
+        }
+
+        // Check if the block we are trying to place the sigil IN is air/replaceable
+        if (!level.getBlockState(hitPos).isAir()) {
+            return SpellCastResult.fail("Target surface is obstructed!");
+        }
+
+        return SpellCastResult.success();
+    }
+
+    @Override
     public SpellCastResult execute(Level level, Player player) {
         if (level.isClientSide()) return SpellCastResult.fail();
 
-        Vec3 start = player.getEyePosition();
-        Vec3 end = start.add(player.getLookAngle().scale(RAY_DISTANCE));
-        // Raycast to find target block
-        BlockPos hitPos = raycast(level, player);
-        spawnRayParticlesServer(level, start, end);
+        // We run the raycast again to get the position for execution
+        BlockPos hitPos = getTargetBlock(level, player);
+
         if (hitPos != null) {
-            // Spawn the sigil with a duration
-            WorldEffectManager.add(new ExplosiveSigilEffect(hitPos, player.getUUID(), (int)sigilDuration));
+            Vec3 start = player.getEyePosition();
+            Vec3 end = Vec3.atCenterOf(hitPos); // Visuals look better pointing at the actual sigil
+
+            spawnRayParticlesServer(level, start, end);
+
+            WorldEffectManager.add(new ExplosiveSigilEffect(level, hitPos, player.getUUID(), (int)sigilDuration));
             return SpellCastResult.success();
         }
 
-        return SpellCastResult.fail("No valid target block!");
+        return SpellCastResult.fail();
     }
 
-    private BlockPos raycast(Level level, Player player) {
+    /**
+     * Helper to find the BlockPos where the sigil should be placed.
+     * Returns the position relative to the face hit (the empty space in front of the block).
+     */
+    private BlockPos getTargetBlock(Level level, Player player) {
         Vec3 start = player.getEyePosition();
         Vec3 end = start.add(player.getLookAngle().scale(RAY_DISTANCE));
 
@@ -54,7 +77,6 @@ public class CinderSigilSpell extends Spell {
         ));
 
         if (result.getType() == HitResult.Type.BLOCK) {
-            // Place the sigil at the face of the block
             return result.getBlockPos().relative(result.getDirection());
         }
 
@@ -64,7 +86,7 @@ public class CinderSigilSpell extends Spell {
     private void spawnRayParticlesServer(Level level, Vec3 start, Vec3 end) {
         if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) return;
 
-        int points = 20; // number of particles along the ray
+        int points = 15;
         Vec3 diff = end.subtract(start);
 
         for (int i = 0; i <= points; i++) {
@@ -73,15 +95,7 @@ public class CinderSigilSpell extends Spell {
             double y = start.y + diff.y * t;
             double z = start.z + diff.z * t;
 
-            serverLevel.sendParticles(
-                    ParticleTypes.FLAME, // particle type
-                    x, y, z,            // particle position
-                    1,                   // particle count
-                    0, 0, 0,             // offset
-                    0                    // speed
-            );
+            serverLevel.sendParticles(ParticleTypes.FLAME, x, y, z, 1, 0, 0, 0, 0);
         }
     }
-
-
 }

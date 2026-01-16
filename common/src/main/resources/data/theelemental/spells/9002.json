@@ -1,0 +1,10 @@
+{
+  "SpellName": "Air Spout",
+  "ManaCost": 60,
+  "Cooldown": 2020,
+  "Duration": 2000,
+  "Description": "Hover above the ground in an air spout",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

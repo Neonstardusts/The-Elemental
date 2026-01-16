@@ -338,6 +338,11 @@ public class UtilityHelper {
         return hsbToRgb(hue, 0.7f, 1.0f);
     }
 
+    public static int getPaleRainbowColor(int speed) {
+        float hue = (System.currentTimeMillis() % speed) / (float) speed;
+        return hsbToRgb(hue, 0.3f, 1.0f);
+    }
+
     /**
      * Manual HSB to RGB conversion to avoid using java.awt.Color
      */
