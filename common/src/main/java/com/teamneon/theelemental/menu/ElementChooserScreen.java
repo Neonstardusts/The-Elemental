@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -124,32 +125,69 @@ public class ElementChooserScreen extends AbstractContainerScreen<ElementChooser
 
             // Calculate height of previous word-wrap (font height * number of lines)
             int descLines = this.font.split(Component.literal(ElementRegistry.getMessage(elId)), wrapWidth).size();
-            currentY += (descLines * 9) + 25; // 9 is standard font height, 6 is padding
+            currentY += (descLines * 9) + 12; // 9 is standard font height, 6 is padding
 
-            // 4. Passives Section
+            // --- Helper logic to handle the dual-coloring ---
+// Define these colors at the top of your class or method
+            int COLOR_TITLE = 0xFFFFFFFF; // White
+            int COLOR_DESC  = 0xFFAAAAAA; // Light Grey
+
+// 4. Passives Section
             List<String> passives = ElementRegistry.getPassives(elId);
             if (!passives.isEmpty()) {
                 graphics.drawString(this.font, "❤ ᴘᴀꜱꜱɪᴠᴇ:", MESSAGE_TEXT_X, currentY, 0xFF85e06e);
                 currentY += 10;
                 for (String p : passives) {
-                    String text = "• " + p;
-                    graphics.drawWordWrap(this.font, Component.literal(text), MESSAGE_TEXT_X, currentY, wrapWidth, 0xFFFFFFFF);
-                    int lines = this.font.split(Component.literal(text), wrapWidth).size();
-                    currentY += (lines * 9);
+                    String[] parts = p.split(": ", 2);
+                    MutableComponent comp = Component.literal("• ");
+                    if (parts.length == 2) {
+                        comp.append(Component.literal(parts[0] + ": ").withStyle(s -> s.withColor(COLOR_TITLE)));
+                        comp.append(Component.literal(parts[1]).withStyle(s -> s.withColor(COLOR_DESC)));
+                    } else {
+                        comp.append(Component.literal(p).withStyle(s -> s.withColor(COLOR_TITLE)));
+                    }
+                    graphics.drawWordWrap(this.font, comp, MESSAGE_TEXT_X, currentY, wrapWidth, 0xFFFFFFFF);
+                    currentY += (this.font.split(comp, wrapWidth).size() * 9);
                 }
-                currentY += 6; // Spacing after section
+                currentY += 6;
             }
 
-            // 5. Restrictions Section
+// 5. Kingdom Section
+            List<String> kingdomEffect = ElementRegistry.getKingdomEffect(elId);
+            if (!kingdomEffect.isEmpty()) {
+                graphics.drawString(this.font, "★ ᴋɪɴɢᴅᴏᴍ ᴇꜰꜰᴇᴄᴛꜱ:", MESSAGE_TEXT_X, currentY, 0xFFf7e274);
+                currentY += 10;
+                for (String k : kingdomEffect) {
+                    String[] parts = k.split(": ", 2);
+                    MutableComponent comp = Component.literal("• ");
+                    if (parts.length == 2) {
+                        comp.append(Component.literal(parts[0] + ": ").withStyle(s -> s.withColor(COLOR_TITLE)));
+                        comp.append(Component.literal(parts[1]).withStyle(s -> s.withColor(COLOR_DESC)));
+                    } else {
+                        comp.append(Component.literal(k).withStyle(s -> s.withColor(COLOR_TITLE)));
+                    }
+                    graphics.drawWordWrap(this.font, comp, MESSAGE_TEXT_X, currentY, wrapWidth, 0xFFFFFFFF);
+                    currentY += (this.font.split(comp, wrapWidth).size() * 9);
+                }
+                currentY += 6;
+            }
+
+// 6. Restrictions Section
             List<String> restrictions = ElementRegistry.getRestrictions(elId);
             if (!restrictions.isEmpty()) {
                 graphics.drawString(this.font, "❌ ʀᴇꜱᴛʀɪᴄᴛɪᴏɴꜱ:", MESSAGE_TEXT_X, currentY, 0xFFeb6360);
                 currentY += 10;
                 for (String r : restrictions) {
-                    String text = "• " + r;
-                    graphics.drawWordWrap(this.font, Component.literal(text), MESSAGE_TEXT_X, currentY, wrapWidth, 0xFFFFFFFF);
-                    int lines = this.font.split(Component.literal(text), wrapWidth).size();
-                    currentY += (lines * 9);
+                    String[] parts = r.split(": ", 2);
+                    MutableComponent comp = Component.literal("• ");
+                    if (parts.length == 2) {
+                        comp.append(Component.literal(parts[0] + ": ").withStyle(s -> s.withColor(COLOR_TITLE)));
+                        comp.append(Component.literal(parts[1]).withStyle(s -> s.withColor(COLOR_DESC)));
+                    } else {
+                        comp.append(Component.literal(r).withStyle(s -> s.withColor(COLOR_TITLE)));
+                    }
+                    graphics.drawWordWrap(this.font, comp, MESSAGE_TEXT_X, currentY, wrapWidth, 0xFFFFFFFF);
+                    currentY += (this.font.split(comp, wrapWidth).size() * 9);
                 }
             }
         }
