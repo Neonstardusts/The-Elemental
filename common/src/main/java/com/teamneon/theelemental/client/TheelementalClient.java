@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.ModBlocks;
 import com.teamneon.theelemental.client.model.ModModelLayers;
 import com.teamneon.theelemental.client.model.WaterSpellModel;
+import com.teamneon.theelemental.client.model.WingCosmeticModel;
 import com.teamneon.theelemental.client.renderer.SpawnLightningRenderer;
 import com.teamneon.theelemental.client.renderer.WaterSpellRenderer;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
@@ -56,6 +57,8 @@ public class TheelementalClient {
                     ModEntities.SPAWN_LIGHTNING,
                     SpawnLightningRenderer::new
             );
+
+
         });
 
         registrars.modelLayers(registrar -> {
@@ -63,6 +66,12 @@ public class TheelementalClient {
                     ModModelLayers.WATER_SPELL.model(), // The Identifier/ResourceLocation
                     ModModelLayers.WATER_SPELL.layer(), // The layer name ("main")
                     WaterSpellModel::createBodyLayer     // The geometry definition
+            );
+
+            registrar.register(
+                    ModModelLayers.WINGS.model(),
+                    ModModelLayers.WINGS.layer(),
+                    WingCosmeticModel::createBodyLayer
             );
         });
 

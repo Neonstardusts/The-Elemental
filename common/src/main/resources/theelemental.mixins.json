@@ -1,13 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.teamneon.theelemental.mixin",
+  "package": "com.teamneon.theelemental.mixin.client",
   "refmap": "theelemental.refmap.json",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],
   "client": [
-    "MinecraftMixin"
+    "AvatarRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
