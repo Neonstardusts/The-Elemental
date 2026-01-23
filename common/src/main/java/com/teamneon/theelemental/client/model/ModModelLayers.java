@@ -5,6 +5,10 @@ import static com.teamneon.theelemental.Theelemental.id;
 
 public class ModModelLayers {
     public static final ModelLayerLocation WATER_SPELL = new ModelLayerLocation(id("water_spell"), "main");
-    // Added for Wings
+
+    //Cosmetics
+
     public static final ModelLayerLocation WINGS = new ModelLayerLocation(id("wings"), "main");
+    public static final ModelLayerLocation FLUTTER_WINGS = new ModelLayerLocation(id("flutter_wings"), "main");
+    public static final ModelLayerLocation HALO = new ModelLayerLocation(id("halo"), "main");
 }

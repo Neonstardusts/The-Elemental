@@ -7,6 +7,6 @@ public class CosmeticRenderState extends EntityRenderState {
     public boolean isSlim;
     public int packedLight;
 
-    // You can add more variables here that models might need,
-    // like 'isFlying' or 'isCrouching'
+    // --- Added for Customization ---
+    public int element = 0; // The element ID from ClientElementalData
 }
