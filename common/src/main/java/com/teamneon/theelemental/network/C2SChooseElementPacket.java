@@ -32,6 +32,8 @@ public record C2SChooseElementPacket(int elementId) implements CustomPacketPaylo
         // 1. Existing Logic: Set and Sync Data
         ElementalDataHandler.get(serverPlayer).setElement(message.elementId());
         ElementalDataHandler.syncToClient(serverPlayer);
+        ElementalDataHandler.broadcastElement(serverPlayer);
+
         ElementalDataHandler.save(serverPlayer);
 
         // 2. Play Sound (To the player and people nearby)

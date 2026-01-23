@@ -8,12 +8,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import static com.teamneon.theelemental.Theelemental.id;
 
-public class WingCosmeticModel extends CosmeticModel {
-    private static final Identifier TEXTURE = id("textures/entity/cosmetic/wings.png");
+public class FlutterWingModel extends CosmeticModel {
+    private static final Identifier TEXTURE = id("textures/entity/cosmetic/flutter_wings.png");
     private final ModelPart leftWing;
     private final ModelPart rightWing;
 
-    public WingCosmeticModel(ModelPart root) {
+    public FlutterWingModel(ModelPart root) {
         super(root);
         this.leftWing = root.getChild("left_wing");
         this.rightWing = root.getChild("right_wing");
@@ -23,52 +23,47 @@ public class WingCosmeticModel extends CosmeticModel {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        // Adjusting Y from 0.0F to -3.0F to move the wings up the back
-        float verticalOffset = -3.0F;
+        float verticalPos = -2.0F;
 
-        // LEFT WING
         root.addOrReplaceChild("left_wing", CubeListBuilder.create()
                         .texOffs(0, 0)
-                        .addBox(0.0F, 0.0F, 0.0F, 12.0F, 16.0F, 0.0F),
-                PartPose.offset(1.0F, verticalOffset, 2.0F));
+                        .addBox(0.0F, 0.0F, 0.0F, 14.0F, 10.0F, 0.0F),
+                PartPose.offset(1.0F, verticalPos, 2.0F));
 
-        // RIGHT WING
         root.addOrReplaceChild("right_wing", CubeListBuilder.create()
                         .texOffs(0, 0)
                         .mirror()
-                        .addBox(-12.0F, 0.0F, 0.0F, 12.0F, 16.0F, 0.0F),
-                PartPose.offset(-1.0F, verticalOffset, 2.0F));
+                        .addBox(-14.0F, 0.0F, 0.0F, 14.0F, 10.0F, 0.0F),
+                PartPose.offset(-1.0F, verticalPos, 2.0F));
 
         return LayerDefinition.create(mesh, 32, 32);
     }
 
     @Override
     public void setupAnim(CosmeticRenderState state) {
-        // Check if we should be flapping (either in air or moving horizontally)
         if (state.isInAir || state.flapSpeed > 0.01f) {
 
-            // 1. FIXED FREQUENCY
-            // No variables here, just a constant value for a steady beat.
-            // 0.15f is a graceful, medium-slow speed.
-            float frequency = 0.15f;
+            // 1. LIMIT THE SPEED (The "Speed Ceiling")
+            // We clamp flapSpeed so it never exceeds a reasonable value (0.3).
+            // This stops the "blur" effect during high-velocity falls or sprints.
+            float limitedFlapSpeed = Math.min(state.flapSpeed, 0.3f);
 
-            // 2. LARGE ARC (Increased Amplitude)
-            // 0.8f creates a wide, sweeping motion.
-            // Adjust this number higher for a wider arc, lower for a tighter flap.
-            float flap = Mth.sin(state.ageInTicks * frequency) * 0.8f;
+            // 2. SLOW DOWN THE BASE MATH
+            // We reduce the multipliers significantly.
+            // 0.1f is a calm base, and adding a small fraction of movement speed.
+            float frequency = 0.3f + (limitedFlapSpeed * 0.2f);
 
-            // Apply to wings
+            // 3. RENDER THE FLAP
+            float flap = Mth.sin(state.ageInTicks * frequency) * 0.5f;
+
             this.leftWing.yRot = -0.5f - flap;
             this.rightWing.yRot = 0.5f + flap;
 
-            // Static flight tilt
             this.leftWing.zRot = 0.25f;
             this.rightWing.zRot = -0.25f;
-
         } else {
-            // 3. IDLE / STATIONARY
-            // When not moving, the wings stay still or "breathe" very slightly.
-            float idleSway = Mth.sin(state.ageInTicks * 0.03f) * 0.02f;
+            // IDLE: Folded and breathing slowly
+            float idleSway = Mth.sin(state.ageInTicks * 0.04f) * 0.03f;
 
             this.leftWing.yRot = -0.2f - idleSway;
             this.rightWing.yRot = 0.2f + idleSway;

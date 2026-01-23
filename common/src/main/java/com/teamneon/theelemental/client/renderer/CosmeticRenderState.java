@@ -6,7 +6,10 @@ public class CosmeticRenderState extends EntityRenderState {
     public float ageInTicks;
     public boolean isSlim;
     public int packedLight;
+    public int element = 0;
+    public int color = 0xFFFFFFFF;
 
-    // You can add more variables here that models might need,
-    // like 'isFlying' or 'isCrouching'
+    // Derived from AvatarRenderState logic
+    public boolean isInAir;
+    public float flapSpeed;
 }

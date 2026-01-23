@@ -85,6 +85,10 @@ public class ElementalEvents {
         });
 
         ServerTickCallback.ServerPlayerTick.AFTER.register(player -> {
+            if (player.tickCount % 100 == 0) {
+                ElementalDataHandler.broadcastElement(player);
+            }
+
             if (player.tickCount % 10 != 0) return;
 
             ElementalData data = ElementalDataHandler.get(player);
@@ -94,7 +98,11 @@ public class ElementalEvents {
             data.tickMana();
             // Sync every tick (testing only)
             ElementalDataHandler.syncToClient(player);
+
+
         });
+
+
 
 // --- 4. Dimension-specific Ticking ---
         // Runs once for every loaded dimension (Overworld, Nether, End)

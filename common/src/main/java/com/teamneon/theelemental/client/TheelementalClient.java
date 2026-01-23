@@ -3,9 +3,7 @@ package com.teamneon.theelemental.client;
 
 import com.mojang.serialization.MapCodec;
 import com.teamneon.theelemental.block.ModBlocks;
-import com.teamneon.theelemental.client.model.ModModelLayers;
-import com.teamneon.theelemental.client.model.WaterSpellModel;
-import com.teamneon.theelemental.client.model.WingCosmeticModel;
+import com.teamneon.theelemental.client.model.*;
 import com.teamneon.theelemental.client.renderer.SpawnLightningRenderer;
 import com.teamneon.theelemental.client.renderer.WaterSpellRenderer;
 import com.teamneon.theelemental.client.tooltip.ModTooltips;
@@ -62,16 +60,32 @@ public class TheelementalClient {
         });
 
         registrars.modelLayers(registrar -> {
+            // Original Water Spell
             registrar.register(
-                    ModModelLayers.WATER_SPELL.model(), // The Identifier/ResourceLocation
-                    ModModelLayers.WATER_SPELL.layer(), // The layer name ("main")
-                    WaterSpellModel::createBodyLayer     // The geometry definition
+                    ModModelLayers.WATER_SPELL.model(),
+                    ModModelLayers.WATER_SPELL.layer(),
+                    WaterSpellModel::createBodyLayer
             );
 
+            // Element 1: Standard Wings
             registrar.register(
                     ModModelLayers.WINGS.model(),
                     ModModelLayers.WINGS.layer(),
                     WingCosmeticModel::createBodyLayer
+            );
+
+            // Element 2: Flutter Wings (Smaller/Faster)
+            registrar.register(
+                    ModModelLayers.FLUTTER_WINGS.model(),
+                    ModModelLayers.FLUTTER_WINGS.layer(),
+                    FlutterWingModel::createBodyLayer
+            );
+
+            // Element 3: Halo
+            registrar.register(
+                    ModModelLayers.HALO.model(),
+                    ModModelLayers.HALO.layer(),
+                    HaloModel::createBodyLayer
             );
         });
 

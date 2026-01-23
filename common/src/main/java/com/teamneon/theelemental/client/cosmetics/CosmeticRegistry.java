@@ -1,8 +1,6 @@
 package com.teamneon.theelemental.client.cosmetics;
 
-import com.teamneon.theelemental.client.model.CosmeticModel;
-import com.teamneon.theelemental.client.model.ModModelLayers;
-import com.teamneon.theelemental.client.model.WingCosmeticModel;
+import com.teamneon.theelemental.client.model.*;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 
@@ -16,6 +14,14 @@ public class CosmeticRegistry {
         // Register your cosmetics here
         register("wings", new CosmeticEntry(
                 new WingCosmeticModel(context.bakeLayer(ModModelLayers.WINGS))
+        ));
+
+        register("flutter_wings", new CosmeticEntry(
+                new FlutterWingModel(context.bakeLayer(ModModelLayers.FLUTTER_WINGS))
+        ));
+
+        register("halo", new CosmeticEntry(
+                new HaloModel(context.bakeLayer(ModModelLayers.HALO))
         ));
 
     }

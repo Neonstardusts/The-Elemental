@@ -67,5 +67,14 @@ public class ModNetworking {
                 (player, message) -> C2SChooseElementPacket.handle(player, message)
         );
 
+
+        //sendotherplayer elements
+        networking.registerClientboundPacket(
+                SyncEntityElementPacket.TYPE,
+                SyncEntityElementPacket.class,
+                SyncEntityElementPacket.STREAM_CODEC,
+                (player, message) -> SyncEntityElementPacket.handle(player, message)
+        );
+
     }
 }
