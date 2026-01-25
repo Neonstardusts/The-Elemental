@@ -16,7 +16,7 @@
   "container.theelemental.soul_forge": "Soul Forge",
   "key.category.theelemental.default": "The Elemental Keybinds",
   "container.theelemental.rune_cutter": "Spell Inscriber",
-  "key.category.theelemental.cast_spell": "Cast Spell",
-  "key.category.theelemental.cycle_slot": "Next Spell",
+  "key.theelemental.cast_spell": "Cast Spell",
+  "key.theelemental.cycle_slot": "Next Spell",
   "item.theelemental.kingdom_starter": "Kingdom Starter"
 }

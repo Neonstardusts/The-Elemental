@@ -1,7 +1,7 @@
 {
   "SpellName": "Blink",
-  "ManaCost": 20,
-  "Cooldown": 40,
+  "ManaCost": 10,
+  "Cooldown": 10,
   "Description": "teleport",
   "RecipeItems": {
     "minecraft:ender_pearl": 2,

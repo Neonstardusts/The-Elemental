@@ -1,0 +1,9 @@
+{
+  "SpellName": "Swap",
+  "ManaCost": 10,
+  "Cooldown": 10,
+  "Description": "teleport switch places and do damage",
+  "RecipeItems": {
+    "minecraft:ender_pearl": 2
+  }
+}

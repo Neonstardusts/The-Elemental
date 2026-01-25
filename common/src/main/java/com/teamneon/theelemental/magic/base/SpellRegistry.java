@@ -155,10 +155,16 @@ public class SpellRegistry {
                 )
         );
 
-
-
         register(8001, json ->
                 new BlinkSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
+        register(8002, json ->
+                new SwapSpell(
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
                         strVal(json, "SpellName")
