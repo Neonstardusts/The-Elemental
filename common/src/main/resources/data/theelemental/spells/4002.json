@@ -1,0 +1,9 @@
+{
+  "SpellName": "Frogify",
+  "ManaCost": 20,
+  "Cooldown": 200,
+  "Description": "Turn mobs into frogs",
+  "RecipeItems": {
+    "minecraft:moss_block": 1
+  }
+}

@@ -4,6 +4,7 @@ import net.blay09.mods.balm.world.level.block.BalmBlockRegistrar;
 import net.blay09.mods.balm.world.level.block.DeferredBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -17,6 +18,8 @@ public class ModBlocks {
     public static DeferredBlock WORLD_CRAFTER;
     public static DeferredBlock WORLD_CRAFTER_PILLAR;
     public static DeferredBlock HOLLOW_ICE;
+    public static DeferredBlock SPECTRAL_BLOCK;
+
 
     public static void initialize(BalmBlockRegistrar blocks) {
         yourBlock = blocks.register("your_block", Block::new, it -> it.strength(-1.0f).pushReaction(PushReaction.BLOCK)).withDefaultItem().asDeferredBlock();
@@ -35,6 +38,18 @@ public class ModBlocks {
 
         HOLLOW_ICE = blocks.register("hollow_ice", HollowIce::new, it ->
                 BlockBehaviour.Properties.ofFullCopy(Blocks.FROSTED_ICE)
+        ).asDeferredBlock();
+
+        SPECTRAL_BLOCK = blocks.register("spectral_block", SpectralBlock::new, it ->
+                it.strength(0.5f)
+                        .friction(0.6f)
+                        .speedFactor(1.2f)
+                        .noOcclusion()
+                        .noLootTable()
+                        .randomTicks()
+                        .lightLevel(state -> 7)
+                        .hasPostProcess((state, level, pos) -> true)
+                        .sound(SoundType.GLASS)
         ).asDeferredBlock();
     }
 

@@ -42,6 +42,8 @@ public class TheelementalClient {
 
         registrars.blockRenderTypes(registrar -> {
             registrar.setRenderLayer(ModBlocks.HOLLOW_ICE, net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
+            registrar.setRenderLayer(ModBlocks.SPECTRAL_BLOCK, net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
+
         });
 
 

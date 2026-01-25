@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "age=0": { "model": "theelemental:block/spectral_block_0" },
+    "age=1": { "model": "theelemental:block/spectral_block_1" },
+    "age=2": { "model": "theelemental:block/spectral_block_2" },
+    "age=3": { "model": "theelemental:block/spectral_block_3" }
+  }
+}

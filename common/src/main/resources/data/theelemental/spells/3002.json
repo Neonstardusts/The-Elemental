@@ -1,0 +1,9 @@
+{
+  "SpellName": "Spectral Bridge",
+  "ManaCost": 20,
+  "Cooldown": 100,
+  "Description": "Create a bridge undernearth you",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

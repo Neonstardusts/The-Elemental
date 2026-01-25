@@ -3,6 +3,7 @@ package com.teamneon.theelemental.magic.base;
 import com.teamneon.theelemental.helpers.SpellJsonLoader;
 import com.teamneon.theelemental.magic.spells.*;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.animal.frog.Frog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,8 +63,33 @@ public class SpellRegistry {
                 )
         );
 
+        register(3002, json ->
+                new SpectralBridgeSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
         register(4001, json ->
                 new PoisonSpraySpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
+                )
+        );
+
+        register(4002, json ->
+                new FrogifySpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName")
+                )
+        );
+
+        register(4003, json ->
+                new GrowthSigilSpell(
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
                         strVal(json, "SpellName"),
@@ -117,6 +143,15 @@ public class SpellRegistry {
                         intVal(json, "ManaCost"),
                         intVal(json, "Cooldown"),
                         strVal(json, "SpellName")
+                )
+        );
+
+        register(7002, json ->
+                new ShadowShiftSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
                 )
         );
 

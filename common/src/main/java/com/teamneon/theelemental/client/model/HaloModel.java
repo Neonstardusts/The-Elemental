@@ -42,7 +42,7 @@ public class HaloModel extends CosmeticModel {
         // --- INVERTED LIME OUTER RING ---
         // We use negative dimensions (-9.0F, -1.2F, -1.0F) to flip the faces.
         // We offset the starting point to compensate for the negative growth direction.
-        CubeListBuilder limeBars = CubeListBuilder.create().texOffs(0, 2);
+        CubeListBuilder limeBars = CubeListBuilder.create().texOffs(0, 8);
 
         // North bar: starts at 4.5, ends at -4.5 because of -9.0 width
         ring.addOrReplaceChild("lime_n", limeBars.addBox(4.5F, 1.1F, -3.5F, -9.0F, -1.2F, -1.0F), PartPose.ZERO);

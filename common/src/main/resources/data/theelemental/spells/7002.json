@@ -1,0 +1,10 @@
+{
+  "SpellName": "Shadow Shift",
+  "ManaCost": 40,
+  "Cooldown": 120,
+  "Duration": 30,
+  "Description": "Travel as black smoke",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}
