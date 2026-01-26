@@ -34,6 +34,9 @@ public class ModItems {
     public static DeferredItem MANA_STORING_CRYSTAL;
     public static DeferredItem MAGIC_CRYSTAL;
 
+    public static DeferredItem ELEMENTAL_UPGRADES;
+
+
     public static void initialize(BalmItemRegistrar items) {
         BLANK_RUNE = items.register("rune_blank", BlankRune::new).asDeferredItem();
         ELEMENT_RUNE = items.register("rune_element", ElementRune::new).asDeferredItem();
@@ -41,11 +44,13 @@ public class ModItems {
 
         KINGDOM_CORE_ITEM = items.register("kingdom_starter", KingdomCoreItem::new).asDeferredItem();
 
-        LEVEL_CRYSTAL = items.register("level_crystal", KingdomCrystal::new).asDeferredItem();
-        RADIUS_CRYSTAL = items.register("radius_crystal", KingdomCrystal::new).asDeferredItem();
-        SLOT_CRYSTAL = items.register("slot_crystal", KingdomCrystal::new).asDeferredItem();
+        ELEMENTAL_UPGRADES = items.register("elemental_upgrades", ElementalUpgrades::new).asDeferredItem();
+
+        LEVEL_CRYSTAL = items.register("level_crystal", LevelCrystal::new).asDeferredItem();
+        RADIUS_CRYSTAL = items.register("radius_crystal", RadiusCrystal::new).asDeferredItem();
+        SLOT_CRYSTAL = items.register("slot_crystal", SlotCrystal::new).asDeferredItem();
         MANA_STORING_CRYSTAL = items.register("mana_storing_crystal", ManaCrystalItem::new).asDeferredItem();
-        MAGIC_CRYSTAL = items.register("magic_crystal", KingdomCrystal::new).asDeferredItem();
+        MAGIC_CRYSTAL = items.register("magic_crystal", MagicCrystal::new).asDeferredItem();
 
 
     }

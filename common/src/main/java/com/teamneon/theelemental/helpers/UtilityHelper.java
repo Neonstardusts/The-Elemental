@@ -338,6 +338,35 @@ public class UtilityHelper {
         return hsbToRgb(hue, 0.7f, 1.0f);
     }
 
+    public static int getMultiFadeColor(int[] colors, int speed) {
+        if (colors.length == 0) return 0xFFFFFF;
+        if (colors.length == 1) return colors[0];
+
+        // 1. Get total progress (0.0 to 1.0) through the entire list
+        double totalProgress = (System.currentTimeMillis() % speed) / (double) speed;
+
+        // 2. Determine which two colors we are between
+        double scaledProgress = totalProgress * colors.length;
+        int index = (int) scaledProgress;
+        int nextIndex = (index + 1) % colors.length;
+
+        // 3. Get the progress between just those two specific colors (0.0 to 1.0)
+        float localFraction = (float) (scaledProgress - index);
+
+        // 4. Smooth out the transition using a cosine curve (optional, but looks better)
+        float smoothFraction = (float) (1.0 - Math.cos(localFraction * Math.PI)) / 2.0f;
+
+        return lerpColor(colors[index], colors[nextIndex], smoothFraction);
+    }
+
+    // Simple RGB Lerp Helper
+    private static int lerpColor(int c1, int c2, float t) {
+        int r = (int) (((c1 >> 16) & 0xFF) + t * (((c2 >> 16) & 0xFF) - ((c1 >> 16) & 0xFF)));
+        int g = (int) (((c1 >> 8) & 0xFF) + t * (((c2 >> 8) & 0xFF) - ((c1 >> 8) & 0xFF)));
+        int b = (int) ((c1 & 0xFF) + t * ((c2 & 0xFF) - (c1 & 0xFF)));
+        return (r << 16) | (g << 8) | b;
+    }
+
     public static int getPaleRainbowColor(int speed) {
         float hue = (System.currentTimeMillis() % speed) / (float) speed;
         return hsbToRgb(hue, 0.3f, 1.0f);

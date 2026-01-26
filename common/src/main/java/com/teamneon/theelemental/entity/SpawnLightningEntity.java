@@ -17,6 +17,7 @@ public class SpawnLightningEntity extends Projectile {
     private static final EntityDataAccessor<Float> TARGET_Z = SynchedEntityData.defineId(SpawnLightningEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> MAX_LIFE = SynchedEntityData.defineId(SpawnLightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SOURCE_ID = SynchedEntityData.defineId(SpawnLightningEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> FROM_SOURCE = SynchedEntityData.defineId(SpawnLightningEntity.class, EntityDataSerializers.BOOLEAN);
 
     public SpawnLightningEntity(EntityType<? extends SpawnLightningEntity> type, Level level) {
         super(type, level);
@@ -35,6 +36,7 @@ public class SpawnLightningEntity extends Projectile {
         builder.define(TARGET_Z, 0.0f);
         builder.define(MAX_LIFE, 5);
         builder.define(SOURCE_ID, -1);
+        builder.define(FROM_SOURCE, false);
     }
 
     @Override
@@ -60,10 +62,20 @@ public class SpawnLightningEntity extends Projectile {
         return new Vector3f(entityData.get(TARGET_X), entityData.get(TARGET_Y), entityData.get(TARGET_Z));
     }
 
-    public void setSourceAndLife(Entity source, int life) {
-        this.entityData.set(SOURCE_ID, source.getId());
+    public void setSourceAndLife(Entity source, int life, boolean fromSource) {
+        if (source != null) {
+            this.entityData.set(SOURCE_ID, source.getId());
+            this.setOwner(source);
+        } else {
+            this.entityData.set(SOURCE_ID, -1);
+            this.setOwner((Entity) null);
+        }
+        this.entityData.set(FROM_SOURCE, fromSource);
         this.entityData.set(MAX_LIFE, life);
-        this.setOwner(source);
+    }
+
+    public boolean shouldRenderFromSource() {
+        return this.entityData.get(FROM_SOURCE);
     }
 
     public int getSourceId() { return this.entityData.get(SOURCE_ID); }

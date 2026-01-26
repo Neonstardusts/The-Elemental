@@ -113,7 +113,7 @@ public class FrogifySpell extends Spell {
         Vec3 eyePos = player.getEyePosition();
         Vec3 viewVec = player.getViewVector(1.0F);
         Vec3 reachVec = eyePos.add(viewVec.scale(MAX_DISTANCE));
-        AABB searchBox = player.getBoundingBox().expandTowards(viewVec.scale(MAX_DISTANCE)).inflate(1.0D, 1.0D, 1.0D);
+        AABB searchBox = player.getBoundingBox().expandTowards(viewVec.scale(MAX_DISTANCE)).inflate(1.75D, 1.75D, 1.75D);
 
         EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
                 player, eyePos, reachVec, searchBox,

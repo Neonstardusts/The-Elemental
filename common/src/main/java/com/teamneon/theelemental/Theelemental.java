@@ -1,5 +1,6 @@
 package com.teamneon.theelemental;
 
+import com.teamneon.theelemental.api.ModSounds;
 import com.teamneon.theelemental.block.entity.ModBlockEntities;
 import com.teamneon.theelemental.client.ModRenderers;
 import com.teamneon.theelemental.command.ModCommands;
@@ -55,6 +56,7 @@ public class Theelemental {
         registrars.blockEntityTypes(ModBlockEntities::initialize);
         registrars.menuTypes(ModMenuTypes::initialize);
 
+        registrars.registrar(net.minecraft.core.registries.Registries.SOUND_EVENT, ModSounds::initialize);
 
         SpellRegistry.init();
         ModRecipes.register();

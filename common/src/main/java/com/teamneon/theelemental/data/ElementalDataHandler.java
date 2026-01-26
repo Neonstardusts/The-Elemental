@@ -31,14 +31,14 @@ public class ElementalDataHandler {
         data.setCurrentMana(PersistentElementStore.getCurrentMana(player));
         data.setManaRegen(PersistentElementStore.getManaRegen(player));
         data.setElement(PersistentElementStore.getElement(player));
-        data.getUnlockedSpells().addAll(PersistentElementStore.getUnlockedSpells(player));
-        data.getActiveSlots().addAll(PersistentElementStore.getActiveSlots(player));
+
+        // Use the setters that clear the list first!
+        data.setUnlockedSpells(PersistentElementStore.getUnlockedSpells(player));
+        data.setActiveSlots(PersistentElementStore.getActiveSlots(player));
 
         LIVE_PLAYER_DATA.put(player.getUUID(), data);
 
-        // Sync private data to the player
         syncToClient(player);
-        // Sync public wing data to everyone nearby
         broadcastElement(player);
 
         Theelemental.logger.info("Loaded and Synced data for {}.", player.getName().getString());

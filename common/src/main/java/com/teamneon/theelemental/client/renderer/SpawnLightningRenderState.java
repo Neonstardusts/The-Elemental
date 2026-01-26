@@ -8,4 +8,5 @@ public class SpawnLightningRenderState extends EntityRenderState {
     public Vector3f sourcePos = new Vector3f();
     public int entityId;
     public int age;
+    public boolean renderFromSource;
 }

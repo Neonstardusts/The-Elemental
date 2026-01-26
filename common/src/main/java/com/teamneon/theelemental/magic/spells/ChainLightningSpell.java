@@ -1,8 +1,10 @@
 package com.teamneon.theelemental.magic.spells;
 
+import com.teamneon.theelemental.api.ModSounds;
 import com.teamneon.theelemental.entity.SpawnLightningEntity;
 import com.teamneon.theelemental.magic.base.Spell;
 import com.teamneon.theelemental.magic.base.SpellCastResult;
+import com.teamneon.theelemental.particles.ModParticles;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -28,39 +30,44 @@ public class ChainLightningSpell extends Spell {
             double range = 10.0;
             Vec3 reachVec = eyePos.add(lookVec.scale(range));
 
-            // 1. Use ProjectileUtil to find the mob the player is looking at
-            AABB searchBox = player.getBoundingBox().expandTowards(lookVec.scale(range)).inflate(1.5);
+            // --- NEW: Casting Sound (Lower pitch for a "heavy" feel) ---
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    ModSounds.ELECTRIC_DAMAGE,
+                    net.minecraft.sounds.SoundSource.PLAYERS,
+                    0.6f, // Slightly louder
+                    0.8f + level.random.nextFloat() * 0.4f); // Lower pitch (0.6 - 0.8)
+
+            AABB searchBox = player.getBoundingBox().expandTowards(lookVec.scale(range)).inflate(2.5f);
             EntityHitResult hitResult = ProjectileUtil.getEntityHitResult(
-                    player,
-                    eyePos,
-                    reachVec,
-                    searchBox,
+                    player, eyePos, reachVec, searchBox,
                     (entity) -> entity instanceof LivingEntity && entity != player,
                     range * range
             );
 
             if (hitResult != null && hitResult.getEntity() instanceof LivingEntity targetMob) {
                 // --- PRIMARY STRIKE ---
-                // Damage the main mob (5.0 = 2.5 hearts)
                 targetMob.hurt(level.damageSources().lightningBolt(), 5.0f);
 
-                // Spawn bolt from Player to Main Mob
-                spawnVisualBolt(level, player, eyePos.subtract(0, 0.5,0), targetMob.position().add(0, targetMob.getBbHeight() * 0.5, 0), 5);
+                // NEW: Effects on primary hit
+                spawnImpactEffects((net.minecraft.server.level.ServerLevel) level, targetMob);
+
+                spawnVisualBolt(level, player, eyePos.subtract(0, 0.5, 0),
+                        targetMob.position().add(0, targetMob.getBbHeight() * 0.5, 0), 5);
 
                 // --- CHAIN LOGIC ---
-                // Find up to 3 nearby mobs in a 4-block radius
                 List<LivingEntity> chains = level.getEntitiesOfClass(LivingEntity.class,
-                        targetMob.getBoundingBox().inflate(4.0),
+                        targetMob.getBoundingBox().inflate(5.0),
                         (e) -> e != player && e != targetMob);
 
                 int count = 0;
                 for (LivingEntity chainTarget : chains) {
-                    if (count >= 3) break; // Limit chain to 3 extra targets
+                    if (count >= 3) break;
 
-                    // Damage the chained mob (3.0 = 1.5 hearts)
                     chainTarget.hurt(level.damageSources().lightningBolt(), 3.0f);
 
-                    // Spawn bolt from Main Mob to the Chain Target
+                    // NEW: Effects on each chain target
+                    spawnImpactEffects((net.minecraft.server.level.ServerLevel) level, chainTarget);
+
                     spawnVisualBolt(level, targetMob,
                             targetMob.position().add(0, targetMob.getBbHeight() * 0.5, 0),
                             chainTarget.position().add(0, chainTarget.getBbHeight() * 0.5, 0),
@@ -69,12 +76,26 @@ public class ChainLightningSpell extends Spell {
                     count++;
                 }
             } else {
-                // --- NO TARGET FOUND ---
-                // Just shoot a bolt 10 blocks forward into the air/ground
                 spawnVisualBolt(level, player, eyePos, reachVec, 5);
             }
         }
         return SpellCastResult.success();
+    }
+
+    private void spawnImpactEffects(net.minecraft.server.level.ServerLevel world, LivingEntity entity) {
+        double px = entity.getX();
+        double py = entity.getY() + (entity.getBbHeight() * 0.5);
+        double pz = entity.getZ();
+
+        // 1. Particles
+        world.sendParticles(ModParticles.STORM_SPARK.asSupplier().get(),
+                px, py, pz, 12, 0.3, 0.3, 0.3, 0.1);
+
+        // 2. Sound
+        // We use a high pitch (2.0f) for the "crack" of the lightning
+        world.playSound(null, px, py, pz,
+                ModSounds.ELECTRIC_DAMAGE,
+                net.minecraft.sounds.SoundSource.PLAYERS, 1.4f, 1.4f + world.random.nextFloat() * 0.6f);
     }
 
     /**
@@ -88,7 +109,7 @@ public class ChainLightningSpell extends Spell {
 
         SpawnLightningEntity bolt = new SpawnLightningEntity(level, spawnPos.x, spawnPos.y, spawnPos.z);
         bolt.setTarget(end.x, end.y, end.z);
-        bolt.setSourceAndLife(source, life);
+        bolt.setSourceAndLife(source, life, true);
         level.addFreshEntity(bolt);
     }
 }

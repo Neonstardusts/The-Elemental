@@ -20,6 +20,7 @@ import com.teamneon.theelemental.menu.SoulForgeScreen;
 import com.teamneon.theelemental.particles.FrostParticle;
 import com.teamneon.theelemental.particles.ModParticles;
 import com.teamneon.theelemental.particles.SorceryParticle;
+import com.teamneon.theelemental.particles.StormSpark;
 import net.blay09.mods.balm.client.BalmClientRegistrars;
 import net.blay09.mods.balm.client.platform.event.callback.RenderCallback;
 import net.blay09.mods.balm.client.platform.event.callback.ScreenCallback;
@@ -100,9 +101,13 @@ public class TheelementalClient {
 
         });
 
+
         registrars.particleProviders((registrar) -> {
             registrar.register(ModParticles.SORCERY_PARTICLE.asHolder(), SorceryParticle.Provider::new);
             registrar.register(ModParticles.FROST_PARTICLE.asHolder(), FrostParticle.Provider::new);
+            registrar.register(ModParticles.STORM_SPARK.asHolder(), StormSpark.Provider::new);
+
+
 
         });
 

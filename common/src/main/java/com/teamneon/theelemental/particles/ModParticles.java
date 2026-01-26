@@ -11,11 +11,14 @@ public class ModParticles {
     // We store the registration object, which acts as a Supplier for the SimpleParticleType
     public static BalmParticleTypeRegistration<SimpleParticleType> SORCERY_PARTICLE;
     public static BalmParticleTypeRegistration<SimpleParticleType> FROST_PARTICLE;
+    public static BalmParticleTypeRegistration<SimpleParticleType> STORM_SPARK;
+
 
     public static void initialize(BalmParticleTypeRegistrar registrar) {
         // Balm's register method for SimpleParticleTypes usually takes a boolean for 'overrideLimiter'
         // true = always visible from far away; false = respects distance settings.
         SORCERY_PARTICLE = registrar.register("sorcery_particle", false);
         FROST_PARTICLE = registrar.register("frost_particle", false);
+        STORM_SPARK = registrar.register("storm_spark", false);
     }
 }

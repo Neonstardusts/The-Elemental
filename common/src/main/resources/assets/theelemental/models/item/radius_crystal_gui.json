@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "theelemental:item/radius_crystal",
+    "layer1": "theelemental:item/radius_crystal_overlay"
+  }
+}

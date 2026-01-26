@@ -2,9 +2,9 @@ package com.teamneon.theelemental.item;
 
 import net.minecraft.world.item.Item;
 
-public class KingdomCrystal extends Item {
+public class MagicCrystal extends Item {
 
-    public KingdomCrystal(Item.Properties properties) {
+    public MagicCrystal(Properties properties) {
         super(properties);
     }
 

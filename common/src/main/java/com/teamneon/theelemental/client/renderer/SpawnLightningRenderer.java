@@ -32,16 +32,21 @@ public class SpawnLightningRenderer extends EntityRenderer<SpawnLightningEntity,
         state.targetPos.set(entity.getTarget());
         state.entityId = entity.getId();
         state.age = entity.tickCount;
+        state.renderFromSource = entity.shouldRenderFromSource(); // Extract boolean
 
-        Entity source = entity.level().getEntity(entity.getSourceId());
-        if (source != null) {
-            // Subtracting 0.5 moves the start point from 'Eyes' to 'Chest' level
-            // Adjust 0.5 to 0.7 if you want it even lower (near the waist/staff hand)
-            Vec3 p = source.getEyePosition(partialTick).subtract(0, 0, 0);
-            state.sourcePos.set((float)p.x, (float)p.y, (float)p.z);
+        if (state.renderFromSource) {
+            // Bolt starts at Player/Source
+            Entity source = entity.level().getEntity(entity.getSourceId());
+            if (source != null) {
+                Vec3 p = source.getEyePosition(partialTick);
+                state.sourcePos.set((float)p.x, (float)p.y, (float)p.z);
+            }
         } else {
-            // If we can't find the player, use the entity's current position (fallback)
-            state.sourcePos.set((float)entity.getX(), (float)entity.getY(), (float)entity.getZ());
+            // Bolt starts at the Cloud (Entity Position)
+            double x = net.minecraft.util.Mth.lerp(partialTick, entity.xo, entity.getX());
+            double y = net.minecraft.util.Mth.lerp(partialTick, entity.yo, entity.getY());
+            double z = net.minecraft.util.Mth.lerp(partialTick, entity.zo, entity.getZ());
+            state.sourcePos.set((float)x, (float)y, (float)z);
         }
     }
 

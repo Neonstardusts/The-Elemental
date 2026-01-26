@@ -1,0 +1,11 @@
+{
+  "SpellName": "Smite",
+  "ManaCost": 60,
+  "Cooldown": 600,
+  "Duration": 100,
+  "RequiredLevel": 0,
+  "Description": "Charges up before smiting nearbye mobs",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

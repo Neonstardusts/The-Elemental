@@ -31,7 +31,7 @@ public class SwapSpell extends Spell {
 
         EntityHitResult hitResult = ProjectileUtil.getEntityHitResult(
                 player, startPos, endPos,
-                player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0D),
+                player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.75D),
                 entity -> entity instanceof LivingEntity && !entity.isSpectator(),
                 range * range
         );

@@ -94,12 +94,6 @@ public class FrostParticle extends SimpleAnimatedParticle {
     }
 
 
-    @Override
-    public int getLightColor(float partialTick) {
-        // Returns full brightness so the ice "glows" even in caves
-        return 15728880;
-    }
-
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 

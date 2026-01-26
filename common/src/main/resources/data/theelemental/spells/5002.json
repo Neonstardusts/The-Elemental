@@ -1,0 +1,11 @@
+{
+  "SpellName": "Storm Cloud",
+  "ManaCost": 40,
+  "Cooldown": 260,
+  "Duration": 200,
+  "RequiredLevel": 0,
+  "Description": "shoots a cloud sentry zapping nearby hostiles",
+  "RecipeItems": {
+    "minecraft:amethyst_shard": 1
+  }
+}

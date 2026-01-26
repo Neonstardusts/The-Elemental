@@ -1,0 +1,8 @@
+{
+  "electric_damage": {
+    "subtitle": "subtitles.theelemental.electric_damage",
+    "sounds": [
+      "theelemental:electric_damage"
+    ]
+  }
+}

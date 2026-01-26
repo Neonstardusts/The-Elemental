@@ -105,6 +105,24 @@ public class SpellRegistry {
                 )
         );
 
+        register(5002, json ->
+                new StormCloudSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
+                )
+        );
+
+        register(5003, json ->
+                new SmiteSpell(
+                        intVal(json, "ManaCost"),
+                        intVal(json, "Cooldown"),
+                        strVal(json, "SpellName"),
+                        intVal(json, "Duration")
+                )
+        );
+
         register(6001, json ->
                 new TorrentSpell(
                         intVal(json, "ManaCost"),

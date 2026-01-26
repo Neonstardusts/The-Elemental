@@ -16,10 +16,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ManaCrystalItem extends Item {
     public ManaCrystalItem(Properties properties) {
@@ -91,34 +94,31 @@ public class ManaCrystalItem extends Item {
         return rainbow;
     }
 
-    /*
     @Override
-    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        boolean shift = Minecraft.getInstance().hasShiftDown();
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        // 1. Get Mana Data
+        ManaData data = stack.get(ModComponents.mana_storage.value());
+        float currentMana = (data != null) ? data.mana() : 0f;
 
-        // Use a list to hold your custom lines
-        List<Component> lines = new java.util.ArrayList<>();
+        // 2. Add Stored Mana (Always present)
+        tooltipAdder.accept(Component.literal("Stored Mana: ")
+                .withStyle(style -> style.withColor(UtilityHelper.darkShiftColor(UtilityHelper.getRainbowColor(10000), 0.3f)))
+                .append(Component.literal((int)currentMana + "/500").withStyle(style -> style.withColor(UtilityHelper.getPaleRainbowColor(10000)))));
 
-        if (shift) {
-            // Main Mana Line (The 50 symbols logic can be handled in your TooltipComponent renderer)
-            lines.add(Component.literal("||||||||||||||||||||||||||||||||||||||||||||||||||").withStyle(ChatFormatting.GRAY));
-
-            // Instruction Lines
-            lines.add(Component.literal("[Shift-Right-Click] ").withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal("Store 10 mana into the crystal").withStyle(ChatFormatting.WHITE)));
-
-            lines.add(Component.literal("[Right-Click] ").withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal("Empty the mana into yourself").withStyle(ChatFormatting.WHITE)));
-
-            lines.add(Component.literal("[Right-Click] ").withStyle(ChatFormatting.AQUA) // bluish color
-                    .append(Component.literal("On kingdom core with magic crystals to create 10 mana").withStyle(ChatFormatting.WHITE)));
+        // 3. Conditional replacement
+        if (!Minecraft.getInstance().hasShiftDown()) {
+            // Standard prompt
+            tooltipAdder.accept(Component.literal("[Shift for ℹ]").withStyle(ChatFormatting.DARK_GRAY));
         } else {
-            lines.add(Component.literal("ℹ [Shift for more information]").withStyle(ChatFormatting.DARK_GRAY));
+            // Replacement when shifting
+            tooltipAdder.accept(Component.literal("ℹ Information").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.UNDERLINE));
+
+            // Your 4 lines
+            tooltipAdder.accept(Component.literal("• Shift-Right-Click: Store mana").withStyle(ChatFormatting.DARK_GRAY));
+            tooltipAdder.accept(Component.literal("• Right-Click: Restore mana").withStyle(ChatFormatting.DARK_GRAY));
+            tooltipAdder.accept(Component.literal("• Use on Kingdom Core to create mana").withStyle(ChatFormatting.DARK_GRAY));
         }
 
-        // Return your custom TooltipComponent data containing the lines
-        return Optional.of(new InfoTooltipComponentData(lines));
     }
-    */
     
 }

@@ -5,6 +5,7 @@ import com.teamneon.theelemental.client.ClientSpellInfo;
 import com.teamneon.theelemental.data.ElementalData;
 import com.teamneon.theelemental.data.ElementalDataHandler;
 import com.teamneon.theelemental.helpers.TempBlock;
+import com.teamneon.theelemental.item.ModItems;
 import com.teamneon.theelemental.magic.base.ActiveSpellManager;
 import com.teamneon.theelemental.magic.base.SpellRegistry;
 import com.teamneon.theelemental.magic.network.SyncSpellInfoPacket;
@@ -12,12 +13,11 @@ import com.teamneon.theelemental.magic.world.WorldEffectManager;
 import com.teamneon.theelemental.store.SpellInfoServerHelper;
 import com.teamneon.theelemental.world.spawn.PillarGenerator;
 import net.blay09.mods.balm.Balm;
-import net.blay09.mods.balm.platform.event.callback.ServerLifecycleCallback;
-import net.blay09.mods.balm.platform.event.callback.ServerPlayerCallback; // Import the structure you found
-import net.blay09.mods.balm.platform.event.callback.ServerTickCallback;
-import net.blay09.mods.balm.platform.event.callback.LevelCallback;
+import net.blay09.mods.balm.platform.event.callback.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import static net.minecraft.world.level.Level.OVERWORLD;
@@ -25,6 +25,36 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 public class ElementalEvents {
 
     public static void register() {
+
+        //spawn in geode loot
+        LivingEntityCallback.Death.Before.EVENT.register((entity, damageSource) -> {
+            // 1. Only run on server
+            if (!entity.level().isClientSide()) {
+
+                // 2. 0.5% chance (1 in 200)
+                float chance = 0.005f;
+
+                if (entity.level().random.nextFloat() < chance) {
+                    // 3. Create the item stack
+                    ItemStack stack = new ItemStack(ModItems.ELEMENTAL_UPGRADES.asItem());
+
+                    // 4. Create and spawn the ItemEntity
+                    ItemEntity itemEntity = new ItemEntity(
+                            entity.level(),
+                            entity.getX(),
+                            entity.getY(),
+                            entity.getZ(),
+                            stack
+                    );
+
+                    entity.level().addFreshEntity(itemEntity);
+                }
+            }
+
+            // 5. Return true to ALLOW the death to continue
+            return true;
+        });
+
         // --- 1. Join Event (Load Data) ---
         // We register a lambda to the official ServerPlayerCallback.Join.EVENT
         ServerPlayerCallback.Join.EVENT.register(player -> {
