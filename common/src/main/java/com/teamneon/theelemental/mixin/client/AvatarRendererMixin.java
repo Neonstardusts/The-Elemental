@@ -26,6 +26,5 @@ public abstract class AvatarRendererMixin<T extends LivingEntity, S extends Avat
     private void theelemental$addCosmeticLayer(EntityRendererProvider.Context context, boolean useSlimModel, CallbackInfo ci) {
         // We pass 'context' into the Layer so it can bake the wings
         this.addLayer(new CosmeticRenderLayer<>((RenderLayerParent<S, M>) (Object) this, context));
-        System.out.println("[Elemental Debug] Layer Added and Baked!");
     }
 }
