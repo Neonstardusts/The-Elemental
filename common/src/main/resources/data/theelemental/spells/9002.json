@@ -1,10 +1,15 @@
 {
   "SpellName": "Air Spout",
   "ManaCost": 60,
-  "Cooldown": 2020,
-  "Duration": 2000,
-  "Description": "Hover above the ground in an air spout",
+  "Cooldown": 800,
+  "Duration": 600,
+  "RequiredLevel": 0,
+  "Description": "Summons a persistent, swirling vortex of wind beneath your feet. Allowing you to hover and glide over the terrain.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "minecraft:breeze_rod": 2,
+    "minecraft:wind_charge": 4,
+    "minecraft:phantom_membrane": 2,
+    "minecraft:ghast_tear": 1
   }
 }

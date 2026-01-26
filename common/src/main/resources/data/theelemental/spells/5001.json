@@ -2,8 +2,12 @@
   "SpellName": "Chain Lightning",
   "ManaCost": 5,
   "Cooldown": 7,
-  "Description": "shoot chain lightning.",
+  "Description": "Unleashes a surging bolt of electricity that arcs between multiple nearby enemies.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:lightning_rod": 1,
+    "minecraft:copper_ingot": 3,
+    "minecraft:amethyst_shard": 1,
+    "minecraft:glowstone_dust": 2,
+    "minecraft:iron_nugget": 2
   }
 }

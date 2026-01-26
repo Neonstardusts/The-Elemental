@@ -1,7 +1,9 @@
 package com.teamneon.theelemental.menu;
 
+import com.ibm.icu.impl.Utility;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.teamneon.theelemental.Theelemental;
+import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.menu.SoulForgeMenu;
 import com.teamneon.theelemental.menu.SoulForgeSlot;
 import com.teamneon.theelemental.menu.C2SAssignSpellsPacket;
@@ -175,7 +177,7 @@ public class SoulForgeScreen extends AbstractContainerScreen<SoulForgeMenu> {
 // Level number (blue)
         graphics.drawString(
                 this.font,
-                String.valueOf(data.getLevel()),
+                UtilityHelper.toSmallCaps(UtilityHelper.toRoman(data.getLevel() + 1)),
                 x,
                 y+10,
                 YELLOW,

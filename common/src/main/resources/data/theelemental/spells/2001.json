@@ -2,7 +2,7 @@
   "SpellName": "Lux",
   "ManaCost": 10,
   "Cooldown": 20,
-  "Description": "Cast a beam, damaging mobs, or solidifying as light",
+  "Description": "Fires a concentrated beam of radiance that sears enemies or manifests into solid light.",
   "RecipeItems": {
     "minecraft:amethyst_shard": 3,
     "minecraft:gold_ingot": 3,

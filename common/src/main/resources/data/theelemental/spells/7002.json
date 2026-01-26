@@ -3,8 +3,12 @@
   "ManaCost": 40,
   "Cooldown": 120,
   "Duration": 30,
-  "Description": "Travel as black smoke",
+  "RequiredLevel": 1,
+  "Description": "Dissolve your physical form into a cloud of dark smoke. Allowing you to quick travel unharmed.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:soul_lantern": 1,
+    "minecraft:ink_sac": 4,
+    "minecraft:black_dye": 2,
+    "minecraft:firework_star": 2
   }
 }

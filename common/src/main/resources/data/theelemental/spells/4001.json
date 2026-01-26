@@ -3,10 +3,12 @@
   "ManaCost": 20,
   "Cooldown": 60,
   "Duration": 200,
-  "Description": "Spray poison breath, duration spell",
+  "Description": "Exhale a toxic mist, inflicting damage.",
   "RecipeItems": {
     "minecraft:moss_block": 2,
     "minecraft:amethyst_shard": 1,
-    "minecraft:spore_blossom": 3
+    "minecraft:spore_blossom": 3,
+    "minecraft:spider_eye": 2,
+    "minecraft:poisonous_potato": 1
   }
 }

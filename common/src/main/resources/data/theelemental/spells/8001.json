@@ -1,11 +1,13 @@
 {
   "SpellName": "Blink",
-  "ManaCost": 10,
+  "ManaCost": 15,
   "Cooldown": 10,
-  "Description": "teleport",
+  "Description": "Instantly fracture space to reappear a short distance ahead.",
   "RecipeItems": {
     "minecraft:ender_pearl": 2,
     "minecraft:amethyst_shard": 1,
-    "minecraft:obsidian": 3
+    "minecraft:obsidian": 3,
+    "minecraft:crying_obsidian": 1,
+    "minecraft:echo_shard": 2
   }
 }
