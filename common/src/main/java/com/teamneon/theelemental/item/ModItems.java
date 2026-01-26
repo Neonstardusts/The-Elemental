@@ -65,6 +65,7 @@ public class ModItems {
                             output.accept(ModItems.KINGDOM_CORE_ITEM);
                             output.accept(ModItems.MANA_STORING_CRYSTAL);
 
+                            output.accept(ModItems.ELEMENTAL_UPGRADES);
                             output.accept(ModItems.MAGIC_CRYSTAL);
                             output.accept(ModItems.LEVEL_CRYSTAL);
                             output.accept(ModItems.RADIUS_CRYSTAL);
