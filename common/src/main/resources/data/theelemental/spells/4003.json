@@ -4,8 +4,11 @@
   "Cooldown": 800,
   "Duration": 400,
   "RequiredLevel": 0,
-  "Description": "Place a verdant sigil that increases growth rate in the radius.",
+  "Description": "Etches a verdant rune upon the earth that accelerates the growth of all nearby flora.",
   "RecipeItems": {
-    "minecraft:ghast_tear": 1
+    "minecraft:ghast_tear": 1,
+    "minecraft:bone_meal": 4,
+    "minecraft:moss_block": 2,
+    "minecraft:oak_sapling": 2
   }
 }

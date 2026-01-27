@@ -2,8 +2,12 @@
   "SpellName": "Leap",
   "ManaCost": 20,
   "Cooldown": 40,
-  "Description": "Launch yourself forward",
+  "RequiredLevel": 0,
+  "Description": "Harnesses kinetic energy to vault yourself through the air.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "minecraft:rabbit_foot": 1,
+    "minecraft:feather": 4,
+    "minecraft:slime_ball": 3
   }
 }

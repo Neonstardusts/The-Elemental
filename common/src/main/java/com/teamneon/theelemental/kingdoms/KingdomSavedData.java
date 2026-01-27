@@ -20,7 +20,6 @@ public class KingdomSavedData extends SavedData {
 
     public KingdomSavedData() {
         this.cores = new HashMap<>();
-        System.out.println("[KingdomSavedData DEBUG] Initialized empty map");
     }
 
     private KingdomSavedData(Map<String, KingdomCoreEntry> cores) {
@@ -48,7 +47,6 @@ public class KingdomSavedData extends SavedData {
     public static KingdomSavedData get(ServerLevel level) {
         ServerLevel overworld = level.getServer().overworld();
         KingdomSavedData data = overworld.getDataStorage().computeIfAbsent(TYPE);
-        System.out.println("[KingdomSavedData DEBUG] Accessed global data, contains " + data.cores.size() + " entries");
         return data;
     }
 
@@ -56,7 +54,6 @@ public class KingdomSavedData extends SavedData {
         String key = "E" + element;
         KingdomCoreEntry entry = cores.get(key);
         if (entry == null) {
-            System.out.println("[KingdomSavedData DEBUG] getCorePos: No kingdom found for element " + element);
             return null;
         }
         return entry.getPos();
@@ -64,9 +61,7 @@ public class KingdomSavedData extends SavedData {
 
     public void registerCore(int element, BlockPos pos) {
         String key = "E" + element;
-        System.out.println("[KingdomSavedData DEBUG] registerCore: Creating kingdom " + key);
         cores.put(key, KingdomCoreEntry.of(element, pos));
         setDirty();
-        System.out.println("[KingdomSavedData DEBUG] registerCore: Marked dirty, total entries: " + cores.size());
     }
 }

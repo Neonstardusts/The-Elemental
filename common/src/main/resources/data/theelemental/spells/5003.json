@@ -3,9 +3,12 @@
   "ManaCost": 60,
   "Cooldown": 600,
   "Duration": 100,
-  "RequiredLevel": 0,
-  "Description": "Charges up before smiting nearbye mobs",
+  "RequiredLevel": 1,
+  "Description": "Channels atmospheric pressure into a trifecta of. Catastrophic lightning upon nearby foes.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:lightning_rod": 1,
+    "minecraft:copper_block": 2,
+    "minecraft:iron_ingot": 3,
+    "minecraft:pointed_dripstone": 3
   }
 }

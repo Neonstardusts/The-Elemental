@@ -4,6 +4,7 @@ import com.teamneon.theelemental.client.ClientElementalData;
 import com.teamneon.theelemental.client.ClientSpellInfo;
 import com.teamneon.theelemental.client.ClientSpellRegistry;
 import com.teamneon.theelemental.helpers.ElementRegistry;
+import com.teamneon.theelemental.helpers.UtilityHelper;
 import com.teamneon.theelemental.magic.base.SpellDefinition;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -264,7 +265,7 @@ public class ElementalRuneCutterScreen extends AbstractContainerScreen<Elemental
                     // Label (Gray)
                     .append(Component.literal(" ꜱᴘᴇʟʟ ʟᴇᴠᴇʟ →").withStyle(style -> style.withColor(0x8a8a8a)))
                     // Fraction: Required / Current (Color based on status)
-                    .append(Component.literal(" " + info.requiredLevel + "/" + playerLevel)
+                    .append(Component.literal(" " + UtilityHelper.toSmallCaps(UtilityHelper.toRoman(info.requiredLevel + 1)))
                             .withStyle(style -> style.withColor(statusColor)));
 
 // Draw the component

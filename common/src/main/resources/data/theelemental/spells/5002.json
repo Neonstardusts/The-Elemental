@@ -4,8 +4,11 @@
   "Cooldown": 260,
   "Duration": 200,
   "RequiredLevel": 0,
-  "Description": "shoots a cloud sentry zapping nearby hostiles",
+  "Description": "Summons a localized nimbus that hovers over the battlefield. Striking nearby foes with bolts of lightning.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:lightning_rod": 1,
+    "minecraft:white_wool": 4,
+    "minecraft:quartz": 2,
+    "minecraft:gunpowder": 2
   }
 }

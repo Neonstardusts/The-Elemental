@@ -2,8 +2,13 @@
   "SpellName": "Frogify",
   "ManaCost": 20,
   "Cooldown": 200,
-  "Description": "Turn mobs into frogs",
+  "RequiredLevel": 1,
+  "Description": "Morphs low-level enemies into harmless frogs, stripping them of their combat prowess.",
   "RecipeItems": {
-    "minecraft:moss_block": 1
+    "minecraft:moss_block": 1,
+    "minecraft:amethyst_shard": 1,
+    "minecraft:slime_ball": 3,
+    "minecraft:lily_pad": 2,
+    "minecraft:brown_mushroom": 2
   }
 }

@@ -44,13 +44,11 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
         this.player = playerInventory.player;
         this.element = element;
 
-        System.out.println("[RuneCutterMenu] Created for element: " + element);
 
         this.inputContainer = new SimpleContainer(1) {
             @Override
             public void setChanged() {
                 super.setChanged();
-                System.out.println("[RuneCutterMenu] Input container changed: " + this.getItem(0));
                 ElementalRuneCutterMenu.this.slotsChanged(this);
             }
         };
@@ -58,7 +56,6 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
         this.resultContainer = new ResultContainer();
 
         this.inputSlot = this.addSlot(new Slot(inputContainer, INPUT_SLOT, 20, 33));
-        System.out.println("[RuneCutterMenu] Input slot added: " + this.inputSlot);
 
         this.resultSlot = this.addSlot(new Slot(resultContainer, RESULT_SLOT, 143, 33) {
             @Override
@@ -68,12 +65,10 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
                 int idx = selectedSpellIndex.get();
                 boolean canPickup = idx >= 0 && idx < availableSpells.size()
                         && ElementalDataHandler.get(player).getLevel() >= availableSpells.get(idx).requiredLevel();
-                System.out.println("[RuneCutterMenu] mayPickup called, idx=" + idx + ", canPickup=" + canPickup);
                 return canPickup;
             }
             @Override
             public void onTake(Player player, ItemStack stack) {
-                System.out.println("[RuneCutterMenu] Result slot taken: " + stack);
                 inputSlot.remove(1);
                 super.onTake(player, stack);
             }
@@ -81,7 +76,6 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
 
         this.addStandardInventorySlots(playerInventory, 8, 84);
         this.addDataSlot(selectedSpellIndex);
-        System.out.println("[RuneCutterMenu] Result slot added: " + this.resultSlot);
 
     }
 
@@ -94,12 +88,10 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
     private void setupSpellList(ItemStack stack) {
         selectedSpellIndex.set(-1);
         resultSlot.set(ItemStack.EMPTY);
-        System.out.println("[RuneCutterMenu] setupSpellList called with stack: " + stack);
 
 
         if (!stack.is(ModItems.BLANK_RUNE.asItem())) {
             availableSpells = List.of();
-            System.out.println("[RuneCutterMenu] Not a blank rune. No spells available.");
 
             return;
         }
@@ -107,7 +99,6 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
         // Use client-side registry if on client
         if (player.level().isClientSide()) {
             availableSpells = ClientSpellRegistry.getSpellsForElement(element);
-            System.out.println("[RuneCutterMenu] Client-side available spells: " + availableSpells.size());
 
         } else {
             var manager = player.level().getServer().getResourceManager();
@@ -116,7 +107,6 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
                     .sorted()
                     .map(id -> new SpellDefinition(id, SpellRegistry.getRequiredLevel(id, manager)))
                     .toList();
-            System.out.println("[RuneCutterMenu] Server-side available spells: " + availableSpells.size());
 
         }
 
@@ -136,11 +126,9 @@ public class ElementalRuneCutterMenu extends AbstractContainerMenu {
     }
 
     private void setupResultSlot(int index) {
-        System.out.println("[RuneCutterMenu] setupResultSlot called with index: " + index);
 
         if (index < 0 || index >= availableSpells.size()) {
             resultSlot.set(ItemStack.EMPTY);
-            System.out.println("[RuneCutterMenu] No spell at this index.");
 
             return;
         }

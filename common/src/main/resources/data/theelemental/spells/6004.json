@@ -2,8 +2,12 @@
   "SpellName": "Ice Shield",
   "ManaCost": 30,
   "Cooldown": 60,
-  "Description": "makes a shield of temepory ice",
+  "RequiredLevel": 1,
+  "Description": "Constructs a crystalline barrier of temporary ice.",
   "RecipeItems": {
-    "minecraft:packed_ice": 1
+    "minecraft:packed_ice": 1,
+    "minecraft:iron_bars": 2,
+    "minecraft:snow_block": 3,
+    "minecraft:glass_pane": 3
   }
 }

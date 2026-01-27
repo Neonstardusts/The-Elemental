@@ -2,8 +2,11 @@
   "SpellName": "Wither Skull",
   "ManaCost": 20,
   "Cooldown": 40,
-  "Description": "Shoot a wither skull",
+  "Description": "Launches a volatile skull of necrotic energy that withers the life force of anything it strikes.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "minecraft:soul_sand": 4,
+    "minecraft:coal_block": 1,
+    "minecraft:bone": 3
   }
 }

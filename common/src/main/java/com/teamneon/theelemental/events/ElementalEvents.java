@@ -78,7 +78,6 @@ public class ElementalEvents {
         // --- 1. Join Event (Load Data) ---
         // We register a lambda to the official ServerPlayerCallback.Join.EVENT
         ServerPlayerCallback.Join.EVENT.register(player -> {
-            System.out.println("!!!! [BALM OFFICIAL] Player Joined: " + player.getName().getString());
 
             // --- 1️⃣ Load player data ---
             ElementalDataHandler.load(player);
@@ -121,8 +120,6 @@ public class ElementalEvents {
             // Note: ServerPlayerCallback events are already server-side,
             // but the check remains a safe practice.
             if (!player.level().isClientSide()) {
-                System.out.println("!!!! [BALM OFFICIAL] Player Left: " + player.getName().getString());
-
                 // Your Save Logic: RAM -> NBT
                 ElementalDataHandler.save(player);
             }
@@ -173,6 +170,5 @@ public class ElementalEvents {
         });
 
 
-        System.out.println("!!!! [BALM OFFICIAL] All ServerPlayerCallbacks are active.");
     }
 }

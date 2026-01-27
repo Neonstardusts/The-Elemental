@@ -20,6 +20,8 @@ import java.util.WeakHashMap;
 public class UtilityHelper {
 
     private static final WeakHashMap<ServerLevel, List<Runnable>> nextTickTasks = new WeakHashMap<>();
+    private static final java.util.TreeMap<Integer, String> ROMAN_MAP = new java.util.TreeMap<>();
+
 
     static {
         // Permanent tick listener
@@ -32,6 +34,34 @@ public class UtilityHelper {
                 tasks.clear();
             }
         });
+
+        ROMAN_MAP.put(1000, "M");
+        ROMAN_MAP.put(900, "CM");
+        ROMAN_MAP.put(500, "D");
+        ROMAN_MAP.put(400, "CD");
+        ROMAN_MAP.put(100, "C");
+        ROMAN_MAP.put(90, "XC");
+        ROMAN_MAP.put(50, "L");
+        ROMAN_MAP.put(40, "XL");
+        ROMAN_MAP.put(10, "X");
+        ROMAN_MAP.put(9, "IX");
+        ROMAN_MAP.put(5, "V");
+        ROMAN_MAP.put(4, "IV");
+        ROMAN_MAP.put(1, "I");
+    }
+
+    public static String toRoman(int number) {
+        if (number <= 0 || number > 3999) return String.valueOf(number);
+
+        StringBuilder builder = new StringBuilder();
+        int remaining = number;
+        while (remaining > 0) {
+            // Find the highest Roman value that fits into the remaining number
+            int entry = ROMAN_MAP.floorKey(remaining);
+            builder.append(ROMAN_MAP.get(entry));
+            remaining -= entry;
+        }
+        return builder.toString();
     }
 
 
@@ -396,6 +426,8 @@ public class UtilityHelper {
         }
         return ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(blue * 255);
     }
+
+
 
 
 }

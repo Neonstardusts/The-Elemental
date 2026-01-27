@@ -3,10 +3,11 @@
   "ManaCost": 20,
   "Cooldown": 400,
   "Duration": 200,
-  "Description": "Water cycle, duration spell",
+  "Description": "Conjures a swirling vortex of pressurized water.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1,
     "minecraft:heart_of_the_sea": 1,
-    "minecraft:prismarine_crystals": 3
+    "minecraft:nautilus_shell": 2,
+    "minecraft:prismarine_shard": 4,
+    "minecraft:kelp": 2
   }
 }

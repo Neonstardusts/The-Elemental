@@ -3,8 +3,11 @@
   "ManaCost": 50,
   "Cooldown": 60,
   "Duration": 60,
-  "Description": "Shoot a volley of arrows",
+  "Description": "Conjures and fires a rapid volley of ethereal arrows to pierce through enemies.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "minecraft:arrow": 5,
+    "minecraft:phantom_membrane": 1,
+    "minecraft:feather": 2
   }
 }

@@ -2,8 +2,11 @@
   "SpellName": "Spectral Bridge",
   "ManaCost": 20,
   "Cooldown": 100,
-  "Description": "Create a bridge undernearth you",
+  "Description": "Manifests a temporary path of ethereal energy beneath your feet.",
   "RecipeItems": {
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "minecraft:glass": 4,
+    "minecraft:ender_pearl": 2,
+    "minecraft:ghast_tear": 2
   }
 }

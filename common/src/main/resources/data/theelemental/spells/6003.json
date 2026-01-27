@@ -2,8 +2,12 @@
   "SpellName": "Freeze",
   "ManaCost": 20,
   "Cooldown": 40,
-  "Description": "shoot a ray to freeze blocks or damage mobs",
+  "Description": "Emits a sub-zero beam that solidifies water into ice. And chills enemies to the core.",
   "RecipeItems": {
-    "minecraft:packed_ice": 1
+    "minecraft:packed_ice": 1,
+    "minecraft:snow_block": 2,
+    "minecraft:blue_ice": 1,
+    "minecraft:quartz_shard": 3,
+    "minecraft:snowball": 2
   }
 }

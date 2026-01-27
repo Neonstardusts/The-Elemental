@@ -1,9 +1,14 @@
 {
   "SpellName": "Swap",
-  "ManaCost": 10,
-  "Cooldown": 10,
-  "Description": "teleport switch places and do damage",
+  "ManaCost": 20,
+  "Cooldown": 40,
+  "RequiredLevel": 1,
+  "Description": "Forcefully trade positions with a target. Releasing a kinetic shockwave that damages the victim.",
   "RecipeItems": {
-    "minecraft:ender_pearl": 2
+    "minecraft:ender_pearl": 2,
+    "minecraft:chorus_fruit": 3,
+    "minecraft:lodestone": 1,
+    "minecraft:fermented_spider_eye": 1,
+    "minecraft:iron_sword": 2
   }
 }
