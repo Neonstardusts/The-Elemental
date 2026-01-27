@@ -16,7 +16,11 @@ import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.platform.event.callback.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -25,6 +29,22 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 public class ElementalEvents {
 
     public static void register() {
+
+
+        LivingEntityCallback.Damage.Before.EVENT.register((entity, source, amount) -> {
+            if (entity instanceof Player player) {
+                int element = ElementalDataHandler.get(player).getElement();
+
+                /*
+                // ELEMENT 1: FIRE IMMUNITY
+                if (element == 1 && source.is(DamageTypeTags.IS_FIRE)) {
+                    player.extinguishFire();
+                    return 0.0f; // Cancel damage
+                }*/
+
+            }
+            return amount; // Allow all other damage
+        });
 
         //spawn in geode loot
         LivingEntityCallback.Death.Before.EVENT.register((entity, damageSource) -> {
