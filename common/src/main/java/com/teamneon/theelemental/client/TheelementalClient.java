@@ -90,6 +90,13 @@ public class TheelementalClient {
                     ModModelLayers.HALO.layer(),
                     HaloModel::createBodyLayer
             );
+
+            // Element 4: Flower Crown
+            registrar.register(
+                    ModModelLayers.FLOWER_CROWN.model(),
+                    ModModelLayers.FLOWER_CROWN.layer(),
+                    HaloModel::createBodyLayer
+            );
         });
 
 

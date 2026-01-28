@@ -24,6 +24,10 @@ public class CosmeticRegistry {
                 new HaloModel(context.bakeLayer(ModModelLayers.HALO))
         ));
 
+        register("flower_crown", new CosmeticEntry(
+                new FlowerCrownModel(context.bakeLayer(ModModelLayers.FLOWER_CROWN))
+        ));
+
     }
 
     private static void register(String id, CosmeticEntry entry) {

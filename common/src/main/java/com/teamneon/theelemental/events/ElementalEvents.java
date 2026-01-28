@@ -31,50 +31,6 @@ public class ElementalEvents {
     public static void register() {
 
 
-        LivingEntityCallback.Damage.Before.EVENT.register((entity, source, amount) -> {
-            if (entity instanceof Player player) {
-                int element = ElementalDataHandler.get(player).getElement();
-
-                /*
-                // ELEMENT 1: FIRE IMMUNITY
-                if (element == 1 && source.is(DamageTypeTags.IS_FIRE)) {
-                    player.extinguishFire();
-                    return 0.0f; // Cancel damage
-                }*/
-
-            }
-            return amount; // Allow all other damage
-        });
-
-        //spawn in geode loot
-        LivingEntityCallback.Death.Before.EVENT.register((entity, damageSource) -> {
-            // 1. Only run on server
-            if (!entity.level().isClientSide()) {
-
-                // 2. 0.5% chance (1 in 200)
-                float chance = 0.005f;
-
-                if (entity.level().random.nextFloat() < chance) {
-                    // 3. Create the item stack
-                    ItemStack stack = new ItemStack(ModItems.ELEMENTAL_UPGRADES.asItem());
-
-                    // 4. Create and spawn the ItemEntity
-                    ItemEntity itemEntity = new ItemEntity(
-                            entity.level(),
-                            entity.getX(),
-                            entity.getY(),
-                            entity.getZ(),
-                            stack
-                    );
-
-                    entity.level().addFreshEntity(itemEntity);
-                }
-            }
-
-            // 5. Return true to ALLOW the death to continue
-            return true;
-        });
-
         // --- 1. Join Event (Load Data) ---
         // We register a lambda to the official ServerPlayerCallback.Join.EVENT
         ServerPlayerCallback.Join.EVENT.register(player -> {

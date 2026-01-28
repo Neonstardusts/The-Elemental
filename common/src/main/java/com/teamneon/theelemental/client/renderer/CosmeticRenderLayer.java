@@ -31,6 +31,7 @@ public class CosmeticRenderLayer<S extends AvatarRenderState, M extends Humanoid
             case 1 -> "wings";
             case 2 -> "flutter_wings";
             case 3 -> "halo";
+            case 4 -> "flower_crown";
             default -> null;
         };
 
